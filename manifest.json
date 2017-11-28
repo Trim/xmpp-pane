@@ -1,0 +1,13 @@
+{
+
+  "manifest_version": 2,
+  
+  "name": "__MSG_extensionName__",
+  "version": "1.0",
+  
+  "author": "Adrien Dorsaz",
+  "homepage_url": "https://projects.adorsaz.ch/adrien/xmpp-pane",
+
+  "default_locale": "en",
+  "description": "__MSG_extensionDescription__"
+}
