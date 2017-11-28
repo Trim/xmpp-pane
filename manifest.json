@@ -1,5 +1,4 @@
 {
-
   "manifest_version": 2,
   
   "name": "__MSG_extensionName__",
@@ -9,5 +8,11 @@
   "homepage_url": "https://projects.adorsaz.ch/adrien/xmpp-pane",
 
   "default_locale": "en",
-  "description": "__MSG_extensionDescription__"
+  "description": "__MSG_extensionDescription__",
+
+  "sidebar_action": {
+    "default_title": "__MSG_sidebarTitle__",
+    "default_panel": "src/sidebar/panel.html",
+    "default_icon": "data/sidebar/icons/32x32/default.png"
+  }
 }
