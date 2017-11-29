@@ -16,6 +16,14 @@
     "page": "src/options/options.html"
   },
 
+  "background": {
+    "scripts": [
+      "src/xmpp/client.js",
+      "src/xmpp/server.js",
+      "src/xmpp-pane-main.js"
+    ]
+  },
+
   "sidebar_action": {
     "default_title": "__MSG_sidebarTitle__",
     "default_panel": "src/sidebar/panel.html",
