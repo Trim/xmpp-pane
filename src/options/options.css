@@ -1,0 +1,21 @@
+fieldset
+{
+    display: grid;
+    grid-template-columns: 8rem 0.5fr;
+    grid-gap: 1rem;
+    vertical-align: middle;
+    padding: 1rem;
+}
+
+
+label
+{
+    text-align: right;
+    line-height: 2.5rem;
+    grid-column: 1 / 2;
+}
+
+input
+{
+    grid-column: 2 / 3;
+}
