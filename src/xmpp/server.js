@@ -1,8 +1,9 @@
-var Server = function (_domain) {
-    this.domain = _domain;
+var Server = function (domain) {
+    return {
 
-    this.hello = function () {
-        console.log('Hello, I am ' + this.domain + ' xmpp server.');
+        hello : function (domain) {
+            console.log('Hello, I am ' + this.domain + ' xmpp server.');
+        }
     }
 }
 

@@ -18,8 +18,8 @@
 
   "background": {
     "scripts": [
-      "src/xmpp/client.js",
       "src/xmpp/server.js",
+      "src/xmpp/client.js",
       "src/xmpp-pane-main.js"
     ]
   },
