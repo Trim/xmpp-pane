@@ -86,13 +86,13 @@ var Client = function(_config) {
                                 reject('Server didn\'t respond with correct Sec-WebSocket-Protocol');
                             }
 
-                            // WebSocket is initialized, we can now initiate XMPP Stream
+                            // WebSocket is initialized, we can now initiate stream header
                             xmppSocket.stanza = Stanza({to: config.domainpart});
 
                             xmppSocket.stanza.init()
                                 .then(xmppSocket.stanza.open)
                                 .then((openStanza) => {
-                                    console.log("xmppSocket will send: " + openStanza);
+                                    console.log("xmppSocket: open stream header: " + openStanza);
                                     xmppSocket.send(openStanza);
                                 })
                                 .then(() => {
@@ -102,6 +102,21 @@ var Client = function(_config) {
 
                         xmppSocket.onmessage = function (event) {
                             console.log('xmppSocket received: ' + event.data);
+
+                            // Need to serialize to DOM and to sanatize content
+
+                            // Need to check errors in string and ask to close
+
+                            // Initiate close when receiving <close>
+                            // <close> can contain see-other-uri to redirect the stream (be careful to keep same security at least)
+                            if(event.data.includes("<close")) {
+                                xmppSocket.stanza.init()
+                                    .then(xmppSocket.stanza.close)
+                                    .then((closeStanza) => {
+                                        console.log("xmppSocket: closing stream header: " + closeStanza);
+                                        xmppSocket.send(closeStanza);
+                                    });
+                            }
                         }
 
                         xmppSocket.onerror = function (event) {
@@ -111,11 +126,6 @@ var Client = function(_config) {
 
                         xmppSocket.onclose = function (event) {
                             console.log('xmppSocket connection closing: ' + event);
-                        }
-
-                        xmppSocket.xmppClose = function (event) {
-                            console.log('xmppSocket asking to close xmpp socket: ' + event);
-                            xmppSocket.send('<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />');
                         }
                     }
 
