@@ -42,7 +42,7 @@ var Client = function(_config) {
             })
         },
 
-        authenticate(_config) {
+        authenticate: function(_config) {
             return new Promise((resolve, reject) => {
 
                 function xrdFindWebsocketURL (xrdBody) {
@@ -86,8 +86,18 @@ var Client = function(_config) {
                                 reject('Server didn\'t respond with correct Sec-WebSocket-Protocol');
                             }
 
-                            xmppSocket.send('<open xmlns="urn:ietf:params:xml:ns:xmpp-framing" to="' + config.domainpart + '" version="1.0" />');
-                            resolve(xmppSocket);
+                            // WebSocket is initialized, we can now initiate XMPP Stream
+                            xmppSocket.stanza = Stanza({to: config.domainpart});
+
+                            xmppSocket.stanza.init()
+                                .then(xmppSocket.stanza.open)
+                                .then((openStanza) => {
+                                    console.log("xmppSocket will send: " + openStanza);
+                                    xmppSocket.send(openStanza);
+                                })
+                                .then(() => {
+                                    resolve(xmppSocket);
+                                });
                         }
 
                         xmppSocket.onmessage = function (event) {
