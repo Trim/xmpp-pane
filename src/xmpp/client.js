@@ -1,3 +1,8 @@
+/*
+ * Implementation of an XMPP client.
+ *
+ * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
+ */
 var Client = function (_config) {
     return {
         readConfig: function () {
@@ -9,7 +14,7 @@ var Client = function (_config) {
 
                     if (localStorage.jid) {
                         config.jid = localStorage.jid;
-                        config.fulljid = config.jid + '/xmpp-pane';
+                        config.fulljid = config.jid + '/xmpp-pane_' + Date.now();
                         let splitedJid = config.jid.split('@');
                         config.localpart = splitedJid[0];
                         config.domainpart = splitedJid[1];
@@ -86,16 +91,17 @@ var Client = function (_config) {
                             reject('Server didn\'t respond with correct Sec-WebSocket-Protocol');
                         }
 
-                        // WebSocket is initialized, we can now initiate stream header
-                        xmppSocket.stanza = Stanza({
+                        // WebSocket is initialized, we have now to initiate Framed Stream
+                        xmppSocket.framedStream = FramedStream({
+                            from: config.jid,
                             to: config.domainpart
                         });
 
-                        xmppSocket.stanza.init()
-                            .then(xmppSocket.stanza.open)
-                            .then((openStanza) => {
-                                console.log("xmppSocket: open stream header: " + openStanza);
-                                xmppSocket.send(openStanza);
+                        xmppSocket.framedStream.init()
+                            .then(xmppSocket.framedStream.open)
+                            .then((openFrame) => {
+                                console.log("xmppSocket: open framed stream: " + openFrame);
+                                xmppSocket.send(openFrame);
                             })
                             .then(() => {
                                 resolve(xmppSocket);
@@ -112,11 +118,11 @@ var Client = function (_config) {
                         // Initiate close when receiving <close>
                         // <close> can contain see-other-uri to redirect the stream (be careful to keep same security at least)
                         if (event.data.includes("<close")) {
-                            xmppSocket.stanza.init()
-                                .then(xmppSocket.stanza.close)
-                                .then((closeStanza) => {
-                                    console.log("xmppSocket: closing stream header: " + closeStanza);
-                                    xmppSocket.send(closeStanza);
+                            xmppSocket.framedStream.init()
+                                .then(xmppSocket.framedStream.close)
+                                .then((closeFrame) => {
+                                    console.log("xmppSocket: closing framed stream: " + closeFrame);
+                                    xmppSocket.send(closeFrame);
                                 });
                         }
                     }

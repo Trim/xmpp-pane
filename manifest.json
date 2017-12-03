@@ -19,6 +19,8 @@
     "background": {
         "scripts": [
             "src/xmpp/constants.js",
+            "src/xmpp/stream.js",
+            "src/xmpp/framed-stream.js",
             "src/xmpp/stanza.js",
             "src/xmpp/server.js",
             "src/xmpp/client.js",

@@ -1,9 +1,9 @@
 /*
- * Stanza is implementation of XMPP stanzas as in defined in XMPP Core.
+ * Stream is implementation of XMPP stream as in defined in XMPP Core.
  *
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
-var Stanza = function (config) {
+var Stream = function (config) {
     return {
         init: function () {
             return new Promise((resolve, reject) => {
@@ -24,23 +24,34 @@ var Stanza = function (config) {
             });
         },
 
-        presence: function (config) {
+        initiate: function (config) {
             return new Promise((resolve, reject) => {
                 resolve();
             });
         },
 
-        message: function (config) {
+        restart: function (config) {
             return new Promise((resolve, reject) => {
                 resolve();
             });
         },
 
-        iq: function (config) {
+        negotiate: function (config) {
             return new Promise((resolve, reject) => {
                 resolve();
             });
         },
 
+        authenticate: function (config) {
+            return new Promise((resolve, reject) => {
+                resolve();
+            });
+        },
+
+        bind: function (config) {
+            return new Promise((resolve, reject) => {
+                resolve();
+            });
+        },
     }
 }
