@@ -48,7 +48,7 @@ class Client {
         });
     }
 
-    authenticate(_config) {
+    connect(_config) {
         return new Promise((resolve, reject) => {
 
             function xrdFindWebsocketURL(xrdBody) {
