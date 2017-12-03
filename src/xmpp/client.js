@@ -92,13 +92,12 @@ var Client = function (_config) {
                         }
 
                         // WebSocket is initialized, we have now to initiate Framed Stream
-                        xmppSocket.framedStream = FramedStream({
+                        xmppSocket.framedStream = new FramedStream({
                             from: config.jid,
                             to: config.domainpart
                         });
 
-                        xmppSocket.framedStream.init()
-                            .then(xmppSocket.framedStream.open)
+                        xmppSocket.framedStream.open
                             .then((openFrame) => {
                                 console.log("xmppSocket: open framed stream: " + openFrame);
                                 xmppSocket.send(openFrame);
@@ -118,8 +117,7 @@ var Client = function (_config) {
                         // Initiate close when receiving <close>
                         // <close> can contain see-other-uri to redirect the stream (be careful to keep same security at least)
                         if (event.data.includes("<close")) {
-                            xmppSocket.framedStream.init()
-                                .then(xmppSocket.framedStream.close)
+                            xmppSocket.framedStream.close
                                 .then((closeFrame) => {
                                     console.log("xmppSocket: closing framed stream: " + closeFrame);
                                     xmppSocket.send(closeFrame);

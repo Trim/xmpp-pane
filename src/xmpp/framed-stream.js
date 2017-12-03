@@ -3,55 +3,38 @@
  *
  * [RFC-7395]: https://tools.ietf.org/html/rfc7395
  */
-var FramedStream = function (config) {
-    return {
-        init: function () {
-            return new Promise((resolve, reject) => {
-                // XML DOM tree (cleared each time)
-                config.dom = document.implementation.createDocument(null, null);
+class FramedStream extends Stream {
+    constructor(_config) {
+        super(_config);
+    }
 
-                // DOM Parser can parse XML string to DOM (created once)
-                if (!config.domParser) {
-                    config.domParser = new DOMParser();
-                }
+    /*
+     * <open /> is used to open a stream header after WebSocket initialization
+     *
+     * [RFC-7395] Section-3.4
+     */
+    get open() {
+        return new Promise((resolve, reject) => {
+            let open = this.config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
+            open.setAttribute("to", this.config.to);
+            open.setAttribute("version", "1.0");
 
-                // Create a DOM to XML serializer (created once)
-                if (!config.xmlSerializer) {
-                    config.xmlSerializer = new XMLSerializer();
-                }
+            resolve(this.config.xmlSerializer.serializeToString(open));
+        });
+    }
 
-                resolve(config);
-            });
-        },
+    /*
+     * <close /> is used to close a stream header before WebSocket close
+     *
+     * [RFC-7395] Section-3.6
+     */
+    get close() {
+        return new Promise((resolve, reject) => {
+            let close = this.config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
+            close.setAttribute("to", this.config.to);
+            close.setAttribute("version", "1.0");
 
-        /*
-         * <open /> is used to open a stream header after WebSocket initialization
-         *
-         * [RFC-7395] Section-3.4
-         */
-        open: function (config) {
-            return new Promise((resolve, reject) => {
-                let open = config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
-                open.setAttribute("to", config.to);
-                open.setAttribute("version", "1.0");
-
-                resolve(config.xmlSerializer.serializeToString(open));
-            });
-        },
-
-        /*
-         * <close /> is used to close a stream header before WebSocket close
-         *
-         * [RFC-7395] Section-3.6
-         */
-        close: function (config) {
-            return new Promise((resolve, reject) => {
-                let close = config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
-                close.setAttribute("to", config.to);
-                close.setAttribute("version", "1.0");
-
-                resolve(config.xmlSerializer.serializeToString(close));
-            });
-        },
+            resolve(this.config.xmlSerializer.serializeToString(close));
+        });
     }
 }

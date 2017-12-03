@@ -3,55 +3,51 @@
  *
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
-var Stream = function (config) {
-    return {
-        init: function () {
-            return new Promise((resolve, reject) => {
-                // XML DOM tree (cleared each time)
-                config.dom = document.implementation.createDocument(null, null);
+class Stream {
+    constructor(_config) {
+        this.config = _config;
 
-                // DOM Parser can parse XML string to DOM (created once)
-                if (!config.domParser) {
-                    config.domParser = new DOMParser();
-                }
+        // XML DOM tree (cleared each time)
+        this.config.dom = document.implementation.createDocument(null, null);
 
-                // Create a DOM to XML serializer (created once)
-                if (!config.xmlSerializer) {
-                    config.xmlSerializer = new XMLSerializer();
-                }
+        // DOM Parser can parse XML string to DOM (created once)
+        if (!this.config.domParser) {
+            this.config.domParser = new DOMParser();
+        }
 
-                resolve(config);
-            });
-        },
+        // Create a DOM to XML serializer (created once)
+        if (!this.config.xmlSerializer) {
+            this.config.xmlSerializer = new XMLSerializer();
+        }
+    }
 
-        initiate: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get initiate() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
 
-        restart: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get restart() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
 
-        negotiate: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get negotiate() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
 
-        authenticate: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get authenticate() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
 
-        bind: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get bind() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
     }
 }

@@ -3,44 +3,39 @@
  *
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
-var Stanza = function (config) {
-    return {
-        init: function () {
-            return new Promise((resolve, reject) => {
-                // XML DOM tree (cleared each time)
-                config.dom = document.implementation.createDocument(null, null);
+class Stanza {
+    constructor(_config) {
+        this.config = _config;
 
-                // DOM Parser can parse XML string to DOM (created once)
-                if (!config.domParser) {
-                    config.domParser = new DOMParser();
-                }
+        // XML DOM tree (cleared each time)
+        this.config.dom = document.implementation.createDocument(null, null);
 
-                // Create a DOM to XML serializer (created once)
-                if (!config.xmlSerializer) {
-                    config.xmlSerializer = new XMLSerializer();
-                }
+        // DOM Parser can parse XML string to DOM (created once)
+        if (!this.config.domParser) {
+            this.config.domParser = new DOMParser();
+        }
 
-                resolve(config);
-            });
-        },
+        // Create a DOM to XML serializer (created once)
+        if (!this.config.xmlSerializer) {
+            this.config.xmlSerializer = new XMLSerializer();
+        }
+    }
 
-        presence: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get presence() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
 
-        message: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
+    get message() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
 
-        iq: function (config) {
-            return new Promise((resolve, reject) => {
-                resolve();
-            });
-        },
-
+    get iq() {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
     }
 }
