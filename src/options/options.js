@@ -4,7 +4,7 @@ function saveOptions(e) {
     function storePassword(hash) {
         browser.storage.local.set({
             password: hash
-            });
+        });
     }
 
     function digestError(error) {
@@ -21,7 +21,7 @@ function saveOptions(e) {
     // Save jid
     browser.storage.local.set({
         jid: document.querySelector("#jid").value
-        });
+    });
 }
 
 function restoreOptions() {
@@ -40,4 +40,3 @@ function restoreOptions() {
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
 document.querySelector("form").addEventListener("submit", saveOptions);
-

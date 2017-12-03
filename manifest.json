@@ -1,34 +1,34 @@
 {
-  "manifest_version": 2,
-  
-  "name": "__MSG_extensionName__",
-  "version": "1.0",
-  
-  "author": "Adrien Dorsaz",
-  "homepage_url": "https://projects.adorsaz.ch/adrien/xmpp-pane",
+    "manifest_version": 2,
 
-  "default_locale": "en",
-  "description": "__MSG_extensionDescription__",
+    "name": "__MSG_extensionName__",
+    "version": "1.0",
 
-  "permissions": ["storage"],
+    "author": "Adrien Dorsaz",
+    "homepage_url": "https://projects.adorsaz.ch/adrien/xmpp-pane",
 
-  "options_ui": {
-    "page": "src/options/options.html"
-  },
+    "default_locale": "en",
+    "description": "__MSG_extensionDescription__",
 
-  "background": {
-    "scripts": [
-      "src/xmpp/constants.js",
-      "src/xmpp/stanza.js",
-      "src/xmpp/server.js",
-      "src/xmpp/client.js",
-      "src/xmpp-pane-main.js"
-    ]
-  },
+    "permissions": ["storage"],
 
-  "sidebar_action": {
-    "default_title": "__MSG_sidebarTitle__",
-    "default_panel": "src/sidebar/panel.html",
-    "default_icon": "data/sidebar/icons/32x32/default.png"
-  }
+    "options_ui": {
+        "page": "src/options/options.html"
+    },
+
+    "background": {
+        "scripts": [
+            "src/xmpp/constants.js",
+            "src/xmpp/stanza.js",
+            "src/xmpp/server.js",
+            "src/xmpp/client.js",
+            "src/xmpp-pane-main.js"
+        ]
+    },
+
+    "sidebar_action": {
+        "default_title": "__MSG_sidebarTitle__",
+        "default_panel": "src/sidebar/panel.html",
+        "default_icon": "data/sidebar/icons/32x32/default.png"
+    }
 }

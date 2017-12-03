@@ -1,4 +1,4 @@
-var Stanza = function(config) {
+var Stanza = function (config) {
     return {
         init: function () {
             return new Promise((resolve, reject) => {
