@@ -1,10 +1,10 @@
 console.log('Welcome to XMPP-Pane main background script.');
 
-var aClient = Client({});
+var xmppPaneClient = new Client();
 var clientSocket = null;
 
-aClient.readConfig()
-    .then(aClient.authenticate)
+xmppPaneClient.config
+    .then(xmppPaneClient.authenticate)
     .then(function (xmppSocket) {
         clientSocket = xmppSocket;
         console.log('background script, client socket: ' + clientSocket);
