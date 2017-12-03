@@ -26,7 +26,7 @@ var Stanza = function(config) {
          */
         open: function (config) {
             return new Promise((resolve, reject) => {
-                let open = config.dom.createElementNS("urn:ietf:params:xml:ns:xmpp-framing", "open");
+                let open = config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
                 open.setAttribute("to", config.to);
                 open.setAttribute("version", "1.0");
 
@@ -41,7 +41,7 @@ var Stanza = function(config) {
          */
         close: function (config) {
             return new Promise((resolve, reject) => {
-                let close = config.dom.createElementNS("urn:ietf:params:xml:ns:xmpp-framing", "close");
+                let close = config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
                 close.setAttribute("to", config.to);
                 close.setAttribute("version", "1.0");
 
