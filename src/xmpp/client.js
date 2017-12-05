@@ -62,7 +62,6 @@ class Client {
                     for (let linkid = 0; linkid < links.length; linkid++) {
                         let aLink = links[linkid];
 
-                        aLink;
                         console.log('found link with rel: ' + aLink.getAttribute("rel"));
 
                         if (aLink.getAttribute("rel") == 'urn:xmpp:alt-connections:websocket') {
@@ -72,12 +71,12 @@ class Client {
                     }
 
                     if (websocketURL) {
-                        resolve(websocketURL)
+                        resolve(websocketURL);
                     }
                     else {
                         reject('no websocket URL found');
                     }
-                })
+                });
             }
 
             function handshake(websocketURL) {
@@ -106,7 +105,7 @@ class Client {
                         .then(() => {
                             resolve(xmppSocket);
                         });
-                }
+                };
 
                 xmppSocket.onmessage = function (event) {
                     console.log('xmppSocket received: ' + event.data);
@@ -124,16 +123,16 @@ class Client {
                                 xmppSocket.send(closeFrame);
                             });
                     }
-                }
+                };
 
                 xmppSocket.onerror = function (event) {
                     console.log('xmppSocket error occured: ' + event);
                     reject(event);
-                }
+                };
 
                 xmppSocket.onclose = function (event) {
                     console.log('xmppSocket connection closing: ' + event);
-                }
+                };
             }
 
             let config = _config;
@@ -149,9 +148,9 @@ class Client {
                     return fetch(xrdUrl)
                         .then(function (response) {
                             return response.text();
-                        })
+                        });
                 })
-                .then(handshake)
+                .then(handshake);
         });
     }
 }
