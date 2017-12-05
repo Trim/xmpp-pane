@@ -13,13 +13,13 @@ class FramedStream extends Stream {
      *
      * [RFC-7395] Section-3.4
      */
-    get open() {
+    open() {
         return new Promise((resolve, reject) => {
-            let open = this.config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
-            open.setAttribute("to", this.config.to);
+            let open = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
+            open.setAttribute("to", this.to);
             open.setAttribute("version", "1.0");
 
-            resolve(this.config.xmlSerializer.serializeToString(open));
+            resolve(this.xmlSerializer.serializeToString(open));
         });
     }
 
@@ -28,13 +28,13 @@ class FramedStream extends Stream {
      *
      * [RFC-7395] Section-3.6
      */
-    get close() {
+    close() {
         return new Promise((resolve, reject) => {
-            let close = this.config.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
-            close.setAttribute("to", this.config.to);
+            let close = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
+            close.setAttribute("to", this.to);
             close.setAttribute("version", "1.0");
 
-            resolve(this.config.xmlSerializer.serializeToString(close));
+            resolve(this.xmlSerializer.serializeToString(close));
         });
     }
 }

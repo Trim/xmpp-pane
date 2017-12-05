@@ -97,7 +97,7 @@ class Client {
                         to: config.domainpart
                     });
 
-                    xmppSocket.framedStream.open
+                    xmppSocket.framedStream.open()
                         .then((openFrame) => {
                             console.log("xmppSocket: open framed stream: " + openFrame);
                             xmppSocket.send(openFrame);
@@ -117,7 +117,7 @@ class Client {
                     // Initiate close when receiving <close>
                     // <close> can contain see-other-uri to redirect the stream (be careful to keep same security at least)
                     if (event.data.includes("<close")) {
-                        xmppSocket.framedStream.close
+                        xmppSocket.framedStream.close()
                             .then((closeFrame) => {
                                 console.log("xmppSocket: closing framed stream: " + closeFrame);
                                 xmppSocket.send(closeFrame);

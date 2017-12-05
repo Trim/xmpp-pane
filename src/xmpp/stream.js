@@ -5,47 +5,77 @@
  */
 class Stream {
     constructor(_config) {
-        this.config = _config;
+        // Allow to define XMPP Core attributes directly
+        this.from = _config.from;
+        this.to = _config.to;
 
         // XML DOM tree (cleared each time)
-        this.config.dom = document.implementation.createDocument(null, null);
+        this.dom = document.implementation.createDocument(null, null);
 
         // DOM Parser can parse XML string to DOM (created once)
-        if (!this.config.domParser) {
-            this.config.domParser = new DOMParser();
+        if (!this.domParser) {
+            this.domParser = new DOMParser();
         }
 
         // Create a DOM to XML serializer (created once)
-        if (!this.config.xmlSerializer) {
-            this.config.xmlSerializer = new XMLSerializer();
+        if (!this.xmlSerializer) {
+            this.xmlSerializer = new XMLSerializer();
         }
     }
 
-    get initiate() {
+    /*
+     * Attributes defined by XMPP Core: from, to 
+     */
+    get from() {
+        return this.from;
+    }
+
+    set from(_from) {
+        this.from = _from;
+    }
+
+    get to() {
+        return this.to;
+    }
+
+    set to(_to) {
+        this.to = _to;
+    }
+
+    /*
+     * Public attributes not defined by XMPP Core
+     */
+
+
+    /*
+     * Class methods
+     */
+
+    initiate() {
         return new Promise((resolve, reject) => {
             resolve();
         });
     }
 
-    get restart() {
+    restart() {
         return new Promise((resolve, reject) => {
             resolve();
         });
     }
 
-    get negotiate() {
+    negotiate() {
         return new Promise((resolve, reject) => {
             resolve();
         });
     }
 
-    get authenticate() {
+    authenticate() {
         return new Promise((resolve, reject) => {
             resolve();
         });
     }
 
-    get bind() {
+    bind() {
         return new Promise((resolve, reject) => {
             resolve();
         });
