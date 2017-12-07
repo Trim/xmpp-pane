@@ -12,14 +12,14 @@ function saveOptions(e) {
     }
 
     // Save new password if required
-    let rawPassword = document.querySelector("#password").value;
-    if (rawPassword) {
-        let bufferPassword = new TextEncoder("utf-8").encode(rawPassword);
+    let passwordInput = document.querySelector("#password");
+    if (passwordInput) {
+        let bufferPassword = new TextEncoder("utf-8").encode(passwordInput.value);
         crypto.subtle.digest('SHA-512', bufferPassword)
             .then(storePassword, digestError);
 
         // Empty password field to be coherent with the placeholder
-        rawPassord.value = null;
+        passwordInput.value = null;
     }
 
     // Save jid
@@ -34,12 +34,8 @@ function restoreOptions() {
         document.querySelector("#jid").value = result.jid || "";
     }
 
-    function onError(error) {
-        console.log('options: error:' + error);
-    }
-
     let getJid = browser.storage.local.get("jid");
-    getJid.then(setJidInput, onError);
+    getJid.then(setJidInput);
 }
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
