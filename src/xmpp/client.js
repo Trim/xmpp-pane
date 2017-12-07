@@ -43,7 +43,15 @@ class Client {
             getJid.then(setJid, onError)
                 .then(getPassword.then(setPassword, onError)
                     .then(() => {
-                        resolve(config);
+                        if (config.jid
+                            && config.localpart
+                            && config.domainpart
+                            && config.password) {
+                            resolve(config);
+                        }
+                        else {
+                            reject(`Some configuration hasn't been found, please configure xmpp-pane first`);
+                        }
                     }));
         });
     }
