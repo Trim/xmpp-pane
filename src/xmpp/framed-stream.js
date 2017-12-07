@@ -17,7 +17,7 @@ class FramedStream extends Stream {
         return new Promise((resolve, reject) => {
             let open = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
             open.setAttribute("to", this.to);
-            open.setAttribute("version", "1.0");
+            open.setAttribute("version", Constants.XMPP_VERSION);
 
             resolve(this.xmlSerializer.serializeToString(open));
         });
@@ -32,7 +32,7 @@ class FramedStream extends Stream {
         return new Promise((resolve, reject) => {
             let close = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
             close.setAttribute("to", this.to);
-            close.setAttribute("version", "1.0");
+            close.setAttribute("version", Constants.XMPP_VERSION);
 
             resolve(this.xmlSerializer.serializeToString(close));
         });

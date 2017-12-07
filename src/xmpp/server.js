@@ -1,8 +1,5 @@
-var Server = function (domain) {
-    return {
-
-        hello: function (domain) {
-            console.log('Hello, I am ' + this.domain + ' xmpp server.');
-        }
-    };
-};
+class Server {
+    constructor(_config) {
+        this.version = (_config.version) ? _config.version : '0.9';
+    }
+}

@@ -64,7 +64,7 @@ class Client {
 
                         console.log('found link with rel: ' + aLink.getAttribute("rel"));
 
-                        if (aLink.getAttribute("rel") == 'urn:xmpp:alt-connections:websocket') {
+                        if (aLink.getAttribute("rel") == Constants.XMPP_ALTCONNECTIONS_WEBSOCKET) {
                             websocketURL = aLink.getAttribute("href");
                             break;
                         }
@@ -150,6 +150,8 @@ class Client {
                             return response.text();
                         });
                 })
+                // TODO: Add extra step to check if we will be using WebSocket over TLS
+                // If not, we stop here and give feedback to user.
                 .then(handshake);
         });
     }
