@@ -56,6 +56,10 @@ class Stream {
         this.attribute.xmllang = _xmllang;
     }
 
+    get id() {
+        return this.attribute.id;
+    }
+
     /*
      * Public attributes not defined by XMPP Core
      */
@@ -67,14 +71,14 @@ class Stream {
 
     initiate() {
         return new Promise((resolve, reject) => {
-            let streamRoot = this.dom.createElementNS(Constants.JABBER_CLIENT, 'stream:stream');
-            streamRoot.addAttribute('xmlns:stream', Constants.NS_STREAM);
-            streamRoot.addAttribute('to', this.to);
-            streamRoot.addAttribute('from', this.from);
+            let streamRoot = this.dom.createElementNS(Constants.NS_STREAM, 'stream:stream');
+            streamRoot.setAttribute('xmlns', Constants.NS_JABBER_CLIENT);
+            streamRoot.setAttribute('to', this.to);
+            streamRoot.setAttribute('from', this.from);
             if (this.xmllang) {
-                streamRoot.addAttribute('xml:lang', this.xmllang);
+                streamRoot.setAttribute('xml:lang', this.xmllang);
             }
-            streamRoot.addAttribute('version', Constants.XMPP_VERSION);
+            streamRoot.setAttribute('version', Constants.XMPP_VERSION);
 
             /* TODO:
              * Whether or not the 'from' attribute is included, each entity MUST
@@ -88,8 +92,8 @@ class Stream {
              * with it, as described under Section 13.5.
              */
 
-            //this.id = response.id; // Store id given by server
-            resolve();
+            //this.attribute.id = response.id; // Store id given by server
+            resolve(streamRoot);
         });
     }
 
