@@ -93,7 +93,20 @@ class Stream {
              */
 
             //this.attribute.id = response.id; // Store id given by server
-            resolve(streamRoot);
+
+            // Stream tag will be closed when XMPP communications needs to end
+            resolve(this.xmlSerializer.serializeToString(streamRoot).replace('</stream:stream>', ''));
+        });
+    }
+
+    /*
+     * When initiating Stream has been acknowledged, server give us the new id
+     * Then, we can negotiate Stream features.
+     */
+    ackInitiate(ackInitiateElement) {
+        return new Promise((resolve, reject) => {
+            this.attribute.id = ackInitiateElement.getAttribute('id');
+            resolve();
         });
     }
 

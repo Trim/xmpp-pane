@@ -16,24 +16,34 @@ class FramedStream extends Stream {
      *
      * [RFC-7395] Section-3.4
      */
-    open() {
-        return super.initiate()
-            .then((streamElement) => {
-                return new Promise((resolve, reject) => {
-                    let open = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
-                    open.setAttribute("from", this.from);
-                    open.setAttribute("to", this.to);
-                    if (this.id) {
-                        open.setAttribute("id", this.id);
-                    }
-                    if (this.xmllang) {
-                        open.setAttribute("xml:lang", this.xmllang);
-                    }
-                    open.setAttribute("version", Constants.XMPP_VERSION);
+    initiate() {
+        return new Promise((resolve, reject) => {
+            let open = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "open");
+            open.setAttribute("from", this.from);
+            open.setAttribute("to", this.to);
+            if (this.id) {
+                open.setAttribute("id", this.id);
+            }
+            if (this.xmllang) {
+                open.setAttribute("xml:lang", this.xmllang);
+            }
+            open.setAttribute("version", Constants.XMPP_VERSION);
 
-                    resolve(this.xmlSerializer.serializeToString(open));
-                });
-            });
+            /* TODO:
+             * Whether or not the 'from' attribute is included, each entity MUST
+             * verify the identity of the other entity before exchanging XML stanzas
+             * with it, as described under Section 13.5.
+             */
+
+            /* TODO:
+             * Whether or not the 'to' attribute is included, each entity MUST
+             * verify the identity of the other entity before exchanging XML stanzas
+             * with it, as described under Section 13.5.
+             */
+
+            //this.attribute.id = response.id; // Store id given by server
+            resolve(this.xmlSerializer.serializeToString(open));
+        });
     }
 
     /*

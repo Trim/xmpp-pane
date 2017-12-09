@@ -4,7 +4,10 @@
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
 class Client {
-    constructor() {}
+    constructor() {
+        // DOM Parser can parse XML string to DOM
+        this.domParser = new DOMParser();
+    }
 
     get config() {
         return new Promise((resolve, reject) => {
@@ -100,18 +103,18 @@ class Client {
                     }
 
                     // WebSocket is initialized, we have now to initiate Framed Stream
-                    xmppSocket.framedStream = new FramedStream({
+                    this.framedStream = new FramedStream({
                         from: config.jid,
                         to: config.domainpart
                     });
 
-                    xmppSocket.framedStream.open()
-                        .then((openFrame) => {
-                            console.log("xmppSocket: open framed stream: " + openFrame);
-                            xmppSocket.send(openFrame);
+                    this.framedStream.open()
+                        .then((openElement) => {
+                            console.log("xmppSocket: open framed stream: " + openElement);
+                            xmppSocket.send(openElement);
                         })
                         .then(() => {
-                            resolve(xmppSocket);
+                            resolve();
                         });
                 };
 

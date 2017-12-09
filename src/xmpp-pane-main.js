@@ -4,8 +4,4 @@ var xmppPaneClient = new Client();
 var clientSocket = null;
 
 xmppPaneClient.config
-    .then(xmppPaneClient.connect)
-    .then(function (xmppSocket) {
-        clientSocket = xmppSocket;
-        console.log('background script, client socket: ' + clientSocket);
-    });
+    .then(xmppPaneClient.connect);
