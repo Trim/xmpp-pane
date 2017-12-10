@@ -4,12 +4,9 @@
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
 class Client {
-    constructor() {
-        // DOM Parser can parse XML string to DOM
-        this.domParser = new DOMParser();
-    }
+    constructor() {}
 
-    get config() {
+    config() {
         return new Promise((resolve, reject) => {
             let config = {};
 
@@ -66,8 +63,8 @@ class Client {
                 return new Promise((resolve, reject) => {
                     let websocketURL = null;
 
-                    let xmlParser = new DOMParser();
-                    let xrdDoc = xmlParser.parseFromString(xrdBody, "application/xml");
+                    let domParser = new DOMParser();
+                    let xrdDoc = domParser.parseFromString(xrdBody, "application/xml");
 
                     let links = xrdDoc.getElementsByTagName("Link");
                     for (let linkid = 0; linkid < links.length; linkid++) {
@@ -92,6 +89,7 @@ class Client {
 
             function handshake(websocketURL) {
                 let xmppSocket = new WebSocket(websocketURL, 'xmpp');
+                xmppSocket.domParser = new DOMParser();
 
                 xmppSocket.onopen = function (event) {
                     console.log('xmppSocket connected: ' + event);
@@ -108,7 +106,7 @@ class Client {
                         to: config.domainpart
                     });
 
-                    this.framedStream.open()
+                    this.framedStream.initiate()
                         .then((openElement) => {
                             console.log("xmppSocket: open framed stream: " + openElement);
                             xmppSocket.send(openElement);
@@ -119,20 +117,33 @@ class Client {
                 };
 
                 xmppSocket.onmessage = function (event) {
-                    console.log('xmppSocket received: ' + event.data);
+                    console.log('xmppSocket raw received: ' + event.data);
 
-                    // Need to serialize to DOM and to sanatize content
+                    // Need to parse to DOM and to sanatize content
+                    let messageDOM = xmppSocket.domParser.parseFromString(event.data, "text/xml");
 
                     // Need to check errors in string and ask to close
+                    switch (messageDOM.documentElement.nodeName) {
 
-                    // Initiate close when receiving <close>
-                    // <close> can contain see-other-uri to redirect the stream (be careful to keep same security at least)
-                    if (event.data.includes("<close")) {
-                        xmppSocket.framedStream.close()
+                    case 'open':
+                        // Server aknowleged our open initiate
+                        this.framedStream.ackInitiate(messageDOM.documentElement);
+                        break;
+
+                    case 'close':
+                        // Initiate close when receiving <close>
+                        // <close> can contain see-other-uri to redirect the stream
+                        // (be careful to keep same security at least in that case)
+                        this.framedStream.close()
                             .then((closeFrame) => {
                                 console.log("xmppSocket: closing framed stream: " + closeFrame);
                                 xmppSocket.send(closeFrame);
                             });
+                        break;
+
+                    default:
+                        console.log('xmppSocket unknown XML element' + messageDOM.documentElement.nodeName);
+                        break;
                     }
                 };
 

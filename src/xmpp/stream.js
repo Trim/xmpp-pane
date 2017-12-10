@@ -106,6 +106,7 @@ class Stream {
     ackInitiate(ackInitiateElement) {
         return new Promise((resolve, reject) => {
             this.attribute.id = ackInitiateElement.getAttribute('id');
+            console.log('stream: received id: ' + this.id);
             resolve();
         });
     }
