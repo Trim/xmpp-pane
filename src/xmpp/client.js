@@ -141,6 +141,27 @@ class Client {
                             });
                         break;
 
+                    case 'stream:features':
+                        // Server give the choice of multiple features.
+                        // Some can be mandatory (there's no particular specification to know if it's required or not)
+                        let features = messageDOM.documenElement;
+
+                        // SASL is always mandatoy
+                        if (features.getAttributes('authentication') == 'SASL') {
+                            // SASL requires multiple message exchange, so we pass the xmppSocket directly to the function
+                            // Message handling will be temporarly managed by the Stream.
+                            this.framedStream.authenticate(xmppSocket, features)
+                                .then(
+                                    success = function () {
+                                        resolve("xmppSocket: client successfully authenticated");
+                                    },
+                                    fail = function () {
+                                        reject("xmppSocket: client wasn't able to authenticate.");
+                                    }
+                                );
+                        }
+                        break;
+
                     default:
                         console.log('xmppSocket unknown XML element' + messageDOM.documentElement.nodeName);
                         break;

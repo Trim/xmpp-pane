@@ -111,6 +111,49 @@ class Stream {
         });
     }
 
+    /*
+     * To authenticate, Stream has to implement SASL.
+     * To simplify SASL protocol messages, Stream temporarly handle WebSocket messages
+     */
+    authenticate(webSocket, saslElement) {
+        return new Promise((resolve, reject) => {
+            // Store current websocket message handling
+            let currentWebSocketOnMessage = webSocket.onmessage;
+            let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
+            let authenticated = false;
+
+            webSocket.onmessage = function (event) {
+                console.log('stream.authenticate raw received: ' + event.data);
+
+                // Need to parse to DOM and to sanatize content
+                let messageDOM = webSocket.domParser.parseFromString(event.data, "text/xml");
+
+                // Need to check errors in string and ask to close
+                switch (messageDOM.documentElement.nodeName) {
+
+                case 'sasl:mechanisms':
+                    break;
+
+                default:
+                    console.log('stream.authenticate unknown XML element' + messageDOM.documentElement.nodeName);
+                    break;
+                }
+            };
+
+            // Restablish original message handler
+            webSocket.onmessage = currentWebSocketOnMessage;
+            if (authenticated) {
+                this.restart()
+                    .then(() => {
+                        resolve('stream.authenticate authenticated and stream restarted.');
+                    });
+            }
+            else {
+                reject('unable to authenticate');
+            }
+        });
+    }
+
     restart() {
         return new Promise((resolve, reject) => {
             resolve();
@@ -118,12 +161,6 @@ class Stream {
     }
 
     negotiate() {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
-
-    authenticate() {
         return new Promise((resolve, reject) => {
             resolve();
         });
