@@ -14,9 +14,11 @@ function saveOptions(e) {
     // Save new password if required
     let passwordInput = document.querySelector("#password");
     if (passwordInput) {
-        let bufferPassword = new TextEncoder("utf-8").encode(passwordInput.value);
-        crypto.subtle.digest('SHA-512', bufferPassword)
-            .then(storePassword, digestError);
+        // TODO Currently, we only implement PLAIN authentication, so we need PLAIN password
+        //let bufferPassword = new TextEncoder("utf-8").encode(passwordInput.value);
+        //crypto.subtle.digest('SHA-512', bufferPassword)
+        //    .then(storePassword, digestError);
+        storePassword(passwordInput.value);
 
         // Empty password field to be coherent with the placeholder
         passwordInput.value = null;
