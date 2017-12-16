@@ -144,10 +144,10 @@ class Client {
                     case 'stream:features':
                         // Server give the choice of multiple features.
                         // Some can be mandatory (there's no particular specification to know if it's required or not)
-                        let features = messageDOM.documenElement;
+                        let features = messageDOM.documentElement;
 
                         // SASL is always mandatoy
-                        if (features.getAttributes('authentication') == 'SASL') {
+                        if (features.getAttribute('authentication') == 'SASL') {
                             // SASL requires multiple message exchange, so we pass the xmppSocket directly to the function
                             // Message handling will be temporarly managed by the Stream.
                             this.framedStream.authenticate(xmppSocket, features)
