@@ -1,4 +1,4 @@
-class SASL - PLAIN {
+class SASLPLAIN {
     constructor() {}
 
     /*

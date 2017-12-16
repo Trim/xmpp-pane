@@ -80,20 +80,6 @@ class Stream {
             }
             streamRoot.setAttribute('version', Constants.XMPP_VERSION);
 
-            /* TODO:
-             * Whether or not the 'from' attribute is included, each entity MUST
-             * verify the identity of the other entity before exchanging XML stanzas
-             * with it, as described under Section 13.5.
-             */
-
-            /* TODO:
-             * Whether or not the 'to' attribute is included, each entity MUST
-             * verify the identity of the other entity before exchanging XML stanzas
-             * with it, as described under Section 13.5.
-             */
-
-            //this.attribute.id = response.id; // Store id given by server
-
             // Stream tag will be closed when XMPP communications needs to end
             resolve(this.xmlSerializer.serializeToString(streamRoot).replace('</stream:stream>', ''));
         });
@@ -107,6 +93,19 @@ class Stream {
         return new Promise((resolve, reject) => {
             this.attribute.id = ackInitiateElement.getAttribute('id');
             console.log('stream: received id: ' + this.id);
+
+            /* TODO:
+             * Whether or not the 'from' attribute is included, each entity MUST
+             * verify the identity of the other entity before exchanging XML stanzas
+             * with it, as described under Section 13.5.
+             */
+
+            /* TODO:
+             * Whether or not the 'to' attribute is included, each entity MUST
+             * verify the identity of the other entity before exchanging XML stanzas
+             * with it, as described under Section 13.5.
+             */
+
             resolve();
         });
     }
