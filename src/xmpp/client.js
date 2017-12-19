@@ -147,16 +147,18 @@ class Client {
                         let features = messageDOM.documentElement;
 
                         // SASL is always mandatoy
-                        if (features.getAttribute('authentication') == 'SASL') {
+                        let saslMechanisms = features.getElementsByTagName('mechanisms');
+                        if (saslMechanisms[0]
+                            && saslMechanisms[0].namespaceURI == Constants.NS_XMPP_SASL) {
                             // SASL requires multiple message exchange, so we pass the xmppSocket directly to the function
                             // Message handling will be temporarly managed by the Stream.
-                            this.framedStream.authenticate(xmppSocket, features)
+                            this.framedStream.authenticate(xmppSocket, features, this.localpart, this.password, null)
                                 .then(
-                                    success = function () {
-                                        resolve("xmppSocket: client successfully authenticated");
+                                    () => {
+                                        console.log("xmppSocket: client successfully authenticated");
                                     },
-                                    fail = function () {
-                                        reject("xmppSocket: client wasn't able to authenticate.");
+                                    () => {
+                                        console.log("xmppSocket: client wasn't able to authenticate.");
                                     }
                                 );
                         }

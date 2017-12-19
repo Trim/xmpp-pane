@@ -15,6 +15,9 @@ class Constants {
     static get NS_STREAM() {
         return "http://etherx.jabber.org/streams";
     }
+    static get NS_XMPP_SASL() {
+        return "urn:ietf:params:xml:ns:xmpp-sasl";
+    }
     static get CLIENT_PREF_SASL_MECHANISM() {
         return ["PLAIN"];
     }
