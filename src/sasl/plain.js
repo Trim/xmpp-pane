@@ -32,7 +32,7 @@ class SASLPLAIN {
 
     sanityCheck(authcid, password, authzid = null) {
         let errorMessage = null;
-        let nulChar = "\0";
+        let nullChar = "\0";
 
         if (!password
             || password == "") {
@@ -40,7 +40,7 @@ class SASLPLAIN {
         }
 
         if (password
-            && password.contains(nullChar)) {
+            && password.indexOf(nullChar) > -1) {
             errorMessage = "SASL-PLAIN: password contains NUL char."
         }
 
@@ -50,12 +50,12 @@ class SASLPLAIN {
         }
 
         if (authcid
-            && authcid.contains(nullChar)) {
+            && authcid.indexOf(nullChar) > -1) {
             errorMessage = "SASL-PLAIN: authentication client contains NUL char."
         }
 
         if (authzid
-            && authzid.contains(nullChar)) {
+            && authzid.indexOf(nullChar) > -1) {
             errorMessage = "SASL-PLAIN: authorization id contains NUL char."
         }
 

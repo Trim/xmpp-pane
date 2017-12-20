@@ -20,6 +20,7 @@
         "scripts": [
             "src/xmpp/constants.js",
             "src/sasl/plain.js",
+            "src/sasl/factory.js",
             "src/xmpp/stream.js",
             "src/xmpp/framed-stream.js",
             "src/xmpp/stanza.js",

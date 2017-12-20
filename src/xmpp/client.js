@@ -7,6 +7,9 @@ class Client {
     constructor(_config) {
         this.saslStep = 0;
         this.config = _config;
+        this.dom = document.implementation.createDocument(null, null);
+        this.domParser = new DOMParser();
+        this.xmlSerializer = new XMLSerializer();
     }
 
     connect() {
@@ -42,7 +45,6 @@ class Client {
 
             function handshake(websocketURL) {
                 let xmppSocket = new WebSocket(websocketURL, 'xmpp');
-                xmppSocket.domParser = new DOMParser();
 
                 xmppSocket.onopen = function (event) {
                     console.log('xmppSocket connected: ' + event);
@@ -55,8 +57,8 @@ class Client {
 
                     // WebSocket is initialized, we have now to initiate Framed Stream
                     this.framedStream = new FramedStream({
-                        from: this.config.jid,
-                        to: this.config.domainpart
+                        from: xmppClient.config.jid,
+                        to: xmppClient.config.domainpart
                     });
 
                     this.framedStream.initiate()
@@ -73,7 +75,7 @@ class Client {
                     console.log('xmppSocket raw received: ' + event.data);
 
                     // Need to parse to DOM and to sanatize content
-                    let messageDOM = xmppSocket.domParser.parseFromString(event.data, "text/xml");
+                    let messageDOM = xmppClient.domParser.parseFromString(event.data, "text/xml");
 
                     // Need to check errors in string and ask to close
                     switch (messageDOM.documentElement.nodeName) {
@@ -108,27 +110,31 @@ class Client {
 
                             // First find client SASL Mechanism which is furnished by server
                             let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
-                            let purposedMechanisms = serverMechanisms.getElementsByTagName('mechanism').map(tag => tag.value);
+                            let purposedMechanisms = saslMechanisms[0].getElementsByTagName('mechanism');
 
-                            let serverSASLMechanism;
+                            let serverSASLMechanism = [];
 
-                            for (let mechanism = 0; mechanism <= purposedMechanisms.length(); mechanism++) {
-                                serverSASLMechanism.push(purposedMechanisms[mechanism].value);
+                            for (let mechanism = 0; mechanism < purposedMechanisms.length; mechanism++) {
+                                serverSASLMechanism.push(purposedMechanisms[mechanism].innerHTML);
                             }
 
                             console.log('stream authenticate: look for mechanism');
 
-                            for (let clientMechanism in clientSASLMechanism) {
-                                console.log('stream authenticate: looking for ' + clientSASLMechanism);
-                                if (serverSASLMechanism.find(clientMechanism)) {
+                            for (let clientMechanism of clientSASLMechanism) {
+                                console.log('stream authenticate: looking for ' + clientMechanism);
+                                if (serverSASLMechanism.find((mechanism) => { return mechanism == clientMechanism; })) {
                                     let factory = new SASLFactory(clientMechanism);
 
-                                    let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
+                                    let auth = xmppClient.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
                                     auth.setAttribute('mechanism', clientMechanism);
-                                    auth.value = factory.getMessage(this.config.localpart, this.config.password, null);
+                                    factory.getMessage(xmppClient.config.localpart, xmppClient.config.password, null)
+                                        .then((saslMessage) => {
+                                            console.log('saslMessage: ' + saslMessage);
+                                            auth.innerHTML = saslMessage;
 
-                                    console.log('stream authenticate will send: ' + this.xmlSerializer.serializeToString(auth));
-                                    xmppSocket.send(this.xmlSerializer.serializeToString(auth));
+                                            console.log('stream authenticate will send: ' + xmppClient.xmlSerializer.serializeToString(auth));
+                                            xmppSocket.send(xmppClient.xmlSerializer.serializeToString(auth));
+                                        });
                                 }
                             }
                         }
@@ -176,6 +182,7 @@ class Client {
             }
 
             let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
+            let xmppClient = this;
 
             fetch(xrdURL)
                 .then(function (response) {
