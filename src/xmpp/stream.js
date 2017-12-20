@@ -110,72 +110,9 @@ class Stream {
         });
     }
 
-    /*
-     * To authenticate, Stream has to implement SASL.
-     * To simplify SASL protocol messages, Stream temporarly handle WebSocket messages
-     */
-    authenticate(webSocket, serverMechanisms, authcid, password, authzid) {
-        return new Promise((resolve, reject) => {
-            // Store current websocket message handling
-            let currentWebSocketOnMessage = webSocket.onmessage;
-
-            webSocket.onmessage = function (event) {
-                console.log('stream.authenticate raw received: ' + event.data);
-
-                // Need to parse to DOM and to sanatize content
-                let messageDOM = webSocket.domParser.parseFromString(event.data, "text/xml");
-
-                // Need to check errors in string and ask to close
-                switch (messageDOM.documentElement.nodeName) {
-
-                case 'failure':
-                    webSocket.onmessage = currentWebSocketOnMessage;
-                    let failure = messageDOM.firstChild().nodeName;
-                    reject('stream authenticate failed with error: ' + failure);
-                    break;
-
-                case 'success':
-                    webSocket.onmessage = currentWebSocketOnMessage;
-                    resolve();
-                    break;
-
-                default:
-                    console.log('stream.authenticate unknown XML element' + messageDOM.documentElement.nodeName);
-                    break;
-                }
-            };
-
-            // Find first client SASL Mechanism which is furnished by server
-            let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
-            let purposedMechanisms = serverMechanisms.getElementsByTagName('mechanism').map(tag => tag.value);
-
-            let serverSASLMechanism;
-
-            for (let mechanism = 0; mechanism <= purposedMechanisms.length(); mechanism++) {
-                serverSASLMechanism.push(purposedMechanisms[mechanism].value);
-            }
-
-            console.log('stream authenticate: look for mechanism');
-
-            for (let clientMechanism in clientSASLMechanism) {
-                console.log('stream authenticate: looking for ' + clientSASLMechanism);
-                if (serverSASLMechanism.find(clientMechanism)) {
-                    let factory = new SASLFactory(clientMechanism);
-
-                    let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
-                    streamRoot.setAttribute('mechanism', clientMechanism);
-                    streamRoot.value = factory.getMessage(authcid, password, authzid);
-
-                    console.log('stream authenticate will send: ' + this.xmlSerializer.serializeToString(auth));
-                    webSocket.send(this.xmlSerializer.serializeToString(auth));
-                }
-            }
-        });
-    }
-
     restart() {
         return new Promise((resolve, reject) => {
-            resolve();
+            reject('stream: restart called, but not currently implemented.');
         });
     }
 

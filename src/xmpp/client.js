@@ -150,17 +150,59 @@ class Client {
                         let saslMechanisms = features.getElementsByTagName('mechanisms');
                         if (saslMechanisms[0]
                             && saslMechanisms[0].namespaceURI == Constants.NS_XMPP_SASL) {
-                            // SASL requires multiple message exchange, so we pass the xmppSocket directly to the function
-                            // Message handling will be temporarly managed by the Stream.
-                            this.framedStream.authenticate(xmppSocket, features, this.localpart, this.password, null)
-                                .then(
-                                    () => {
-                                        console.log("xmppSocket: client successfully authenticated");
-                                    },
-                                    () => {
-                                        console.log("xmppSocket: client wasn't able to authenticate.");
-                                    }
-                                );
+                            // Start SASL negotiation
+                            this.saslStep = 1;
+
+                            // First find client SASL Mechanism which is furnished by server
+                            let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
+                            let purposedMechanisms = serverMechanisms.getElementsByTagName('mechanism').map(tag => tag.value);
+
+                            let serverSASLMechanism;
+
+                            for (let mechanism = 0; mechanism <= purposedMechanisms.length(); mechanism++) {
+                                serverSASLMechanism.push(purposedMechanisms[mechanism].value);
+                            }
+
+                            console.log('stream authenticate: look for mechanism');
+
+                            for (let clientMechanism in clientSASLMechanism) {
+                                console.log('stream authenticate: looking for ' + clientSASLMechanism);
+                                if (serverSASLMechanism.find(clientMechanism)) {
+                                    let factory = new SASLFactory(clientMechanism);
+
+                                    let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
+                                    auth.setAttribute('mechanism', clientMechanism);
+                                    auth.value = factory.getMessage(this.localpart, this.password, null);
+
+                                    console.log('stream authenticate will send: ' + this.xmlSerializer.serializeToString(auth));
+                                    xmppSocket.send(this.xmlSerializer.serializeToString(auth));
+                                }
+                            }
+                        }
+                        break;
+
+                    case 'failure':
+                        // SASL failure
+                        if (this.saslStep >= 0
+                            && messageDOM.documentElement.namespaceURI == Constants.NS_XMPP_SASL) {
+                            let failure = messageDOM.firstChild().nodeName;
+                            console.log('stream authenticate failed with error: ' + failure);
+
+                            this.framedStream.close()
+                                .then((closeFrame) => {
+                                    console.log("xmppSocket: closing framed stream: " + closeFrame);
+                                    xmppSocket.send(closeFrame);
+                                });
+                        }
+                        console.log('xmppSocket: received <failure> outside of known name-space (or with SASL namespace but not currently negotiating).');
+                        break;
+
+                    case 'success':
+                        // SASL success
+                        if (this.saslStep >= 0
+                            && messageDOM.documentElement.namespaceURI == Constants.NS_XMPP_SASL) {
+                            console.log('SASL succeed: restart stream');
+                            this.framedStream.restart();
                         }
                         break;
 
