@@ -4,59 +4,12 @@
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
 class Client {
-    constructor() {}
-
-    config() {
-        return new Promise((resolve, reject) => {
-            let config = {};
-
-            function setJid(localStorage) {
-                console.log('client: local storage found jid: ' + localStorage.jid);
-
-                if (localStorage.jid) {
-                    config.jid = localStorage.jid;
-                    config.fulljid = config.jid + '/xmpp-pane_' + Date.now();
-                    let splitedJid = config.jid.split('@');
-                    config.localpart = splitedJid[0];
-                    config.domainpart = splitedJid[1];
-                }
-
-                console.log('client: local part: ' + config.localpart);
-            }
-
-            function setPassword(localStorage) {
-                console.log('client: local storage found password: ' + localStorage.password);
-                if (localStorage.password) {
-                    config.password = localStorage.password;
-                }
-                //resolve(config);
-            }
-
-            function onError(error) {
-                console.log('client: error:' + error);
-                reject(error);
-            }
-
-            let getJid = browser.storage.local.get("jid");
-            let getPassword = browser.storage.local.get("password");
-
-            getJid.then(setJid, onError)
-                .then(getPassword.then(setPassword, onError)
-                    .then(() => {
-                        if (config.jid
-                            && config.localpart
-                            && config.domainpart
-                            && config.password) {
-                            resolve(config);
-                        }
-                        else {
-                            reject(`Some configuration hasn't been found, please configure xmpp-pane first`);
-                        }
-                    }));
-        });
+    constructor(_config) {
+        this.saslStep = 0;
+        this.config = _config;
     }
 
-    connect(_config) {
+    connect() {
         return new Promise((resolve, reject) => {
 
             function xrdFindWebsocketURL(xrdBody) {
@@ -102,8 +55,8 @@ class Client {
 
                     // WebSocket is initialized, we have now to initiate Framed Stream
                     this.framedStream = new FramedStream({
-                        from: config.jid,
-                        to: config.domainpart
+                        from: this.config.jid,
+                        to: this.config.domainpart
                     });
 
                     this.framedStream.initiate()
@@ -172,7 +125,7 @@ class Client {
 
                                     let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
                                     auth.setAttribute('mechanism', clientMechanism);
-                                    auth.value = factory.getMessage(this.localpart, this.password, null);
+                                    auth.value = factory.getMessage(this.config.localpart, this.config.password, null);
 
                                     console.log('stream authenticate will send: ' + this.xmlSerializer.serializeToString(auth));
                                     xmppSocket.send(this.xmlSerializer.serializeToString(auth));
@@ -222,15 +175,14 @@ class Client {
                 };
             }
 
-            let config = _config;
-            let xrdURL = 'https://' + config.domainpart + '/.well-known/host-meta';
+            let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
 
             fetch(xrdURL)
                 .then(function (response) {
                     return response.text();
                 })
                 .then(xrdFindWebsocketURL, function (error) {
-                    let xrdURL = 'http://' + config.domainpart + '/.well-known/host-meta';
+                    let xrdURL = 'http://' + this.config.domainpart + '/.well-known/host-meta';
 
                     return fetch(xrdUrl)
                         .then(function (response) {
