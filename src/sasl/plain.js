@@ -21,10 +21,10 @@ class SASLPLAIN {
             // authzid can be null when the server has to induce authzid from current credentials
             // (like when using client TLS certificate)
             if (authzid) {
-                message = authzid + "\u0000";
+                message = authzid ;
             }
 
-            message = message + authcid + "\u0000" + password;
+            message = message + "\u0000" + authcid + "\u0000" + password;
             message = btoa(message);
 
             resolve(message);
