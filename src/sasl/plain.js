@@ -21,10 +21,11 @@ class SASLPLAIN {
             // authzid can be null when the server has to induce authzid from current credentials
             // (like when using client TLS certificate)
             if (authzid) {
-                message = authzid + "\0";
+                message = authzid + "\u0000";
             }
 
-            message = message + authcid + "\0" + password;
+            message = message + authcid + "\u0000" + password;
+            message = btoa(message);
 
             resolve(message);
         });
@@ -32,7 +33,7 @@ class SASLPLAIN {
 
     sanityCheck(authcid, password, authzid = null) {
         let errorMessage = null;
-        let nullChar = "\0";
+        let nullChar = "\u0000";
 
         if (!password
             || password == "") {
