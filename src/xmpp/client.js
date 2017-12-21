@@ -10,6 +10,7 @@ class Client {
         this.dom = document.implementation.createDocument(null, null);
         this.domParser = new DOMParser();
         this.xmlSerializer = new XMLSerializer();
+        this.saslDone = false;
     }
 
     connect() {
@@ -106,7 +107,7 @@ class Client {
                         if (saslMechanisms[0]
                             && saslMechanisms[0].namespaceURI == Constants.NS_XMPP_SASL) {
                             // Start SASL negotiation
-                            this.saslStep = 1;
+                            xmppClient.saslStep = 1;
 
                             // First find client SASL Mechanism which is furnished by server
                             let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
@@ -122,7 +123,9 @@ class Client {
 
                             for (let clientMechanism of clientSASLMechanism) {
                                 console.log('stream authenticate: looking for ' + clientMechanism);
-                                if (serverSASLMechanism.find((mechanism) => { return mechanism == clientMechanism; })) {
+                                if (serverSASLMechanism.find((mechanism) => {
+                                        return mechanism == clientMechanism;
+                                    })) {
                                     let factory = new SASLFactory(clientMechanism);
 
                                     let auth = xmppClient.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
@@ -142,7 +145,7 @@ class Client {
 
                     case 'failure':
                         // SASL failure
-                        if (this.saslStep >= 0
+                        if (xmppClient.saslStep >= 0
                             && messageDOM.documentElement.namespaceURI == Constants.NS_XMPP_SASL) {
                             let failure = messageDOM.firstChild().nodeName;
                             console.log('stream authenticate failed with error: ' + failure);
@@ -158,10 +161,23 @@ class Client {
 
                     case 'success':
                         // SASL success
-                        if (this.saslStep >= 0
+                        if (xmppClient.saslStep >= 0
                             && messageDOM.documentElement.namespaceURI == Constants.NS_XMPP_SASL) {
                             console.log('SASL succeed: restart stream');
-                            this.framedStream.restart();
+
+                            // Save SASL State
+                            xmppClient.saslStep = 0;
+                            xmppClient.saslDone = true;
+
+                            // Initiate Stream restart (just send new <open/> as implicitly closed)
+                            this.framedStream.initiate()
+                                .then((openElement) => {
+                                    console.log("xmppSocket: re-opening stream: " + openElement);
+                                    xmppSocket.send(openElement);
+                                })
+                                .then(() => {
+                                    resolve();
+                                });
                         }
                         break;
 

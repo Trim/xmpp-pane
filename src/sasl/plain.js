@@ -21,7 +21,7 @@ class SASLPLAIN {
             // authzid can be null when the server has to induce authzid from current credentials
             // (like when using client TLS certificate)
             if (authzid) {
-                message = authzid ;
+                message = authzid;
             }
 
             message = message + "\u0000" + authcid + "\u0000" + password;
