@@ -42,7 +42,7 @@ class FramedStream extends Stream {
              */
 
             //this.attribute.id = response.id; // Store id given by server
-            resolve(this.xmlSerializer.serializeToString(open));
+            resolve(open);
         });
     }
 
@@ -60,7 +60,29 @@ class FramedStream extends Stream {
             close.setAttribute("to", this.to);
             close.setAttribute("version", Constants.XMPP_VERSION);
 
-            resolve(this.xmlSerializer.serializeToString(close));
+            resolve(close);
         });
+    }
+
+    /*
+     * Take action on XMPP frame element
+     */
+    handle(xmppClient, message) {
+        switch (message.nodeName) {
+        case 'open':
+            // Server aknowleged our open initiate
+            this.ackInitiate(message);
+            break;
+
+        case 'close':
+            // Initiate close when receiving <close>
+            // <close> can contain see-other-uri to redirect the stream
+            // (be careful to keep same security at least in that case)
+            xmppClient.close();
+            break;
+        default:
+            super.handle(xmppClient, message);
+            break
+        }
     }
 }

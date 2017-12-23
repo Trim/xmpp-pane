@@ -12,7 +12,7 @@ class Constants {
     static get NS_JABBER_SERVER() {
         return "jabber:server";
     }
-    static get NS_STREAM() {
+    static get NS_JABBER_STREAM() {
         return "http://etherx.jabber.org/streams";
     }
     static get NS_XMPP_SASL() {

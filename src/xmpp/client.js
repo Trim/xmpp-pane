@@ -5,12 +5,19 @@
  */
 class Client {
     constructor(_config) {
-        this.saslStep = 0;
+        const xmppClient = this;
+        // external configuration
         this.config = _config;
+        // toolbox
         this.dom = document.implementation.createDocument(null, null);
-        this.domParser = new DOMParser();
         this.xmlSerializer = new XMLSerializer();
+        this.stream = null; // XMPP Framed Stream
+        this.socket = null; // WebSocket
+        this.dispatcher = new Dispatcher(this); // WebSocket message dispatcher
+        // internal state
+        this.saslStep = 0;
         this.saslDone = false;
+        this.tls = false;
     }
 
     connect() {
@@ -45,176 +52,163 @@ class Client {
             }
 
             function handshake(websocketURL) {
-                let xmppSocket = new WebSocket(websocketURL, 'xmpp');
+                if (websocketURL.indexOf('wss') > -1) {
+                    xmppClient.tls = true;
+                }
+                else {
+                    xmppClient.tls = false;
+                    reject('handshake: refusing to connect to ' + websocketURL + ' because TLS is not available');
+                }
 
-                xmppSocket.onopen = function (event) {
-                    console.log('xmppSocket connected: ' + event);
+                xmppClient.socket = new WebSocket(websocketURL, 'xmpp');
+
+                xmppClient.socket.onopen = function (event) {
+                    console.log('xmppClient.socket connected: ' + event);
                     // TODO: Check if server response contains HTTP Header Sec-WebSocket-Protocol == xmpp.
                     // Otherwise, close it (not sure if it's doable easily).
                     if (false) {
-                        xmppSocket.close();
+                        xmppClient.socket.close();
                         reject('Server didn\'t respond with correct Sec-WebSocket-Protocol');
                     }
 
                     // WebSocket is initialized, we have now to initiate Framed Stream
-                    this.framedStream = new FramedStream({
+                    xmppClient.stream = new FramedStream({
                         from: xmppClient.config.jid,
                         to: xmppClient.config.domainpart
                     });
 
-                    this.framedStream.initiate()
+                    xmppClient.stream.initiate()
                         .then((openElement) => {
-                            console.log("xmppSocket: open framed stream: " + openElement);
-                            xmppSocket.send(openElement);
+                            xmppClient.send(openElement);
                         })
                         .then(() => {
                             resolve();
                         });
                 };
 
-                xmppSocket.onmessage = function (event) {
-                    console.log('xmppSocket raw received: ' + event.data);
+                xmppClient.socket.onmessage = function (event) {
+                    xmppClient.dispatcher.dispatch(event);
+                }
 
-                    // Need to parse to DOM and to sanatize content
-                    let messageDOM = xmppClient.domParser.parseFromString(event.data, "text/xml");
-
-                    // Need to check errors in string and ask to close
-                    switch (messageDOM.documentElement.nodeName) {
-
-                    case 'open':
-                        // Server aknowleged our open initiate
-                        this.framedStream.ackInitiate(messageDOM.documentElement);
-                        break;
-
-                    case 'close':
-                        // Initiate close when receiving <close>
-                        // <close> can contain see-other-uri to redirect the stream
-                        // (be careful to keep same security at least in that case)
-                        this.framedStream.close()
-                            .then((closeFrame) => {
-                                console.log("xmppSocket: closing framed stream: " + closeFrame);
-                                xmppSocket.send(closeFrame);
-                            });
-                        break;
-
-                    case 'stream:features':
-                        // Server give the choice of multiple features.
-                        // Some can be mandatory (there's no particular specification to know if it's required or not)
-                        let features = messageDOM.documentElement;
-
-                        // SASL is always mandatoy
-                        let saslMechanisms = features.getElementsByTagName('mechanisms');
-                        if (saslMechanisms[0]
-                            && saslMechanisms[0].namespaceURI == Constants.NS_XMPP_SASL) {
-                            // Start SASL negotiation
-                            xmppClient.saslStep = 1;
-
-                            // First find client SASL Mechanism which is furnished by server
-                            let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
-                            let purposedMechanisms = saslMechanisms[0].getElementsByTagName('mechanism');
-
-                            let serverSASLMechanism = [];
-
-                            for (let mechanism = 0; mechanism < purposedMechanisms.length; mechanism++) {
-                                serverSASLMechanism.push(purposedMechanisms[mechanism].innerHTML);
-                            }
-
-                            console.log('stream authenticate: look for mechanism');
-
-                            for (let clientMechanism of clientSASLMechanism) {
-                                console.log('stream authenticate: looking for ' + clientMechanism);
-                                if (serverSASLMechanism.find((mechanism) => {
-                                        return mechanism == clientMechanism;
-                                    })) {
-                                    let factory = new SASLFactory(clientMechanism);
-
-                                    let auth = xmppClient.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
-                                    auth.setAttribute('mechanism', clientMechanism);
-                                    factory.getMessage(xmppClient.config.localpart, xmppClient.config.password, null)
-                                        .then((saslMessage) => {
-                                            console.log('saslMessage: ' + saslMessage);
-                                            auth.innerHTML = saslMessage;
-
-                                            console.log('stream authenticate will send: ' + xmppClient.xmlSerializer.serializeToString(auth));
-                                            xmppSocket.send(xmppClient.xmlSerializer.serializeToString(auth));
-                                        });
-                                }
-                            }
-                        }
-                        break;
-
-                    case 'failure':
-                        // SASL failure
-                        if (xmppClient.saslStep >= 0
-                            && messageDOM.documentElement.namespaceURI == Constants.NS_XMPP_SASL) {
-                            let failure = messageDOM.firstChild().nodeName;
-                            console.log('stream authenticate failed with error: ' + failure);
-
-                            this.framedStream.close()
-                                .then((closeFrame) => {
-                                    console.log("xmppSocket: closing framed stream: " + closeFrame);
-                                    xmppSocket.send(closeFrame);
-                                });
-                        }
-                        console.log('xmppSocket: received <failure> outside of known name-space (or with SASL namespace but not currently negotiating).');
-                        break;
-
-                    case 'success':
-                        // SASL success
-                        if (xmppClient.saslStep >= 0
-                            && messageDOM.documentElement.namespaceURI == Constants.NS_XMPP_SASL) {
-                            console.log('SASL succeed: restart stream');
-
-                            // Save SASL State
-                            xmppClient.saslStep = 0;
-                            xmppClient.saslDone = true;
-
-                            // Initiate Stream restart (just send new <open/> as implicitly closed)
-                            this.framedStream.initiate()
-                                .then((openElement) => {
-                                    console.log("xmppSocket: re-opening stream: " + openElement);
-                                    xmppSocket.send(openElement);
-                                })
-                                .then(() => {
-                                    resolve();
-                                });
-                        }
-                        break;
-
-                    default:
-                        console.log('xmppSocket unknown XML element' + messageDOM.documentElement.nodeName);
-                        break;
-                    }
-                };
-
-                xmppSocket.onerror = function (event) {
+                xmppClient.socket.onerror = function (event) {
                     console.log('xmppSocket error occured: ' + event);
-                    reject(event);
                 };
 
-                xmppSocket.onclose = function (event) {
+                xmppClient.socket.onclose = function (event) {
                     console.log('xmppSocket connection closing: ' + event);
                 };
             }
 
             let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
-            let xmppClient = this;
 
+            const xmppClient = this;
             fetch(xrdURL)
                 .then(function (response) {
                     return response.text();
                 })
                 .then(xrdFindWebsocketURL, function (error) {
-                    let xrdURL = 'http://' + this.config.domainpart + '/.well-known/host-meta';
+                    let xrdURL = 'http://' + xmppClient.config.domainpart + '/.well-known/host-meta';
 
                     return fetch(xrdUrl)
                         .then(function (response) {
                             return response.text();
                         });
                 })
-                // TODO: Add extra step to check if we will be using WebSocket over TLS
-                // If not, we stop here and give feedback to user.
                 .then(handshake);
         });
+    }
+
+    /*
+     * Send text message through websocket.
+     */
+    send(message) {
+        let messageText;
+        if (typeof (message) == 'string') {
+            messageText = message;
+        }
+        else {
+            messageText = this.xmlSerializer.serializeToString(message);
+        }
+        console.log('client: sending: ' + messageText);
+        this.socket.send(messageText);
+    }
+
+    close() {
+        this.stream.close()
+            .then((closeFrame) => {
+                console.log('client: closing');
+                this.send(closeFrame);
+            });
+    }
+
+    handleSASL(message) {
+        console.log('client: handling SASL: ' + message.nodeName);
+        switch (message.nodeName) {
+
+        case 'mechanisms':
+            // Start SASL negotiation
+            this.saslStep = 1;
+
+            // First find client SASL Mechanism which is furnished by server
+            let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
+            let purposedMechanisms = message.getElementsByTagName('mechanism');
+
+            let serverSASLMechanism = [];
+
+            for (let mechanism = 0; mechanism < purposedMechanisms.length; mechanism++) {
+                serverSASLMechanism.push(purposedMechanisms[mechanism].innerHTML);
+            }
+
+            console.log('stream authenticate: look for mechanism');
+
+            for (let clientMechanism of clientSASLMechanism) {
+                if (this.tls == false && clientMechanism == 'PLAIN') {
+                    continue;
+                }
+
+                console.log('stream authenticate: looking for ' + clientMechanism);
+                if (serverSASLMechanism.find((mechanism) => {
+                        return mechanism == clientMechanism;
+                    })) {
+                    let factory = new SASLFactory(clientMechanism);
+
+                    let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
+                    auth.setAttribute('mechanism', clientMechanism);
+                    factory.getMessage(this.config.localpart, this.config.password, null)
+                        .then((saslMessage) => {
+                            console.log('saslMessage: ' + saslMessage);
+                            auth.innerHTML = saslMessage;
+                            this.send(auth);
+                        });
+                }
+            }
+            break;
+
+        case 'failure':
+            if (this.saslStep > 0) {
+                let failure = message.firstChild.nodeName;
+                console.log('stream authenticate failed with error: ' + failure);
+
+                this.close();
+            }
+            break;
+
+        case 'success':
+            if (this.saslStep > 0) {
+                console.log('SASL succeed: restart stream');
+
+                // Save SASL State
+                this.saslStep = 0;
+                this.saslDone = true;
+
+                // Initiate Stream restart (just send new <open/> as implicitly closed)
+                this.stream.initiate()
+                    .then((openElement) => {
+                        console.log("client: re-opening stream.");
+                        this.send(openElement);
+                    });
+            }
+            break;
+        }
     }
 }

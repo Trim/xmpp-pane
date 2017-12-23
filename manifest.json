@@ -25,6 +25,7 @@
             "src/xmpp/framed-stream.js",
             "src/xmpp/stanza.js",
             "src/xmpp/server.js",
+            "src/xmpp/dispatcher.js",
             "src/xmpp/client.js",
             "src/xmpp-pane-main.js"
         ]

@@ -127,4 +127,21 @@ class Stream {
             resolve();
         });
     }
+
+    handle(xmppClient, message) {
+        switch (message.nodeName) {
+        case 'stream:features':
+            // Server give the choice of multiple features.
+            // Some can be mandatory (there's no particular specification to know if it's required or not)
+            let features = message;
+
+            // SASL is always mandatoy
+            let saslMechanisms = features.getElementsByTagName('mechanisms');
+            if (saslMechanisms[0]
+                && saslMechanisms[0].namespaceURI == Constants.NS_XMPP_SASL) {
+                xmppClient.handleSASL(saslMechanisms[0]);
+            }
+            break;
+        }
+    }
 }
