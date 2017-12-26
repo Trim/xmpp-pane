@@ -17,6 +17,7 @@ class Client {
         // internal state
         this.saslStep = 0;
         this.saslDone = false;
+        this.bindDone = false;
         this.tls = false;
     }
 
