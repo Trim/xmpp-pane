@@ -136,10 +136,20 @@ class Stream {
             let features = message;
 
             // SASL is always mandatoy
-            let saslMechanisms = features.getElementsByTagName('mechanisms');
-            if (saslMechanisms[0]
-                && saslMechanisms[0].namespaceURI == Constants.NS_XMPP_SASL) {
-                xmppClient.handleSASL(saslMechanisms[0]);
+            if(xmppClient.saslDone == false)
+            {
+                let saslMechanisms = features.getElementsByTagNameNS(Constants.NS_XMPP_SASL, 'mechanisms');
+                if (saslMechanisms[0]) {
+                    xmppClient.handleSASL(saslMechanisms[0]);
+                }
+            }
+            else if(xmppClient.bindDone == false)
+            {
+                // Bind is mandatory
+                let bindElement = features.getElementsByTagNameNS(Constants.NX_XMPP_BIND, 'bind');
+                if (bindElement[0]){
+
+                }
             }
             break;
         }

@@ -21,6 +21,9 @@ class Constants {
     static get CLIENT_PREF_SASL_MECHANISM() {
         return ["PLAIN"];
     }
+    static get NS_XMPP_BIND() {
+        return "urn:ietf:params:xml:ns:xmpp-bind";
+    }
 
     /*
      * XMPP Subprotocol for WebSocket
