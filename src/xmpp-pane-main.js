@@ -5,7 +5,7 @@ retrieveConfig = function () {
         let config = {};
 
         function setJid(localStorage) {
-            console.log('client: local storage found jid: ' + localStorage.jid);
+            console.log('xmpp-pane-main: local storage found jid: ' + localStorage.jid);
 
             if (localStorage.jid) {
                 config.jid = localStorage.jid;
@@ -15,19 +15,19 @@ retrieveConfig = function () {
                 config.domainpart = splitedJid[1];
             }
 
-            console.log('client: local part: ' + config.localpart);
+            console.log('xmpp-pane-main: full jid: ' + config.fulljid);
+            console.log('xmpp-pane-main: local part: ' + config.localpart);
         }
 
         function setPassword(localStorage) {
-            console.log('client: local storage found password: ' + localStorage.password);
+            console.log('xmpp-pane-main: local storage found password!');
             if (localStorage.password) {
                 config.password = localStorage.password;
             }
-            //resolve(config);
         }
 
         function onError(error) {
-            console.log('client: error:' + error);
+            console.log('xmpp-pane-main: error:' + error);
             reject(error);
         }
 
@@ -44,7 +44,7 @@ retrieveConfig = function () {
                         resolve(config);
                     }
                     else {
-                        reject(`Some configuration hasn't been found, please configure xmpp-pane first`);
+                        reject(`xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first`);
                     }
                 }));
     });
