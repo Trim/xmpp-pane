@@ -122,12 +122,6 @@ class Stream {
         });
     }
 
-    bind() {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    }
-
     handle(xmppClient, message) {
         switch (message.nodeName) {
         case 'stream:features':
@@ -136,19 +130,19 @@ class Stream {
             let features = message;
 
             // SASL is always mandatoy
-            if(xmppClient.saslDone == false)
-            {
+            if (xmppClient.saslDone == false) {
+                console.log('stream: server exposes SASL and client is not authenticated.');
                 let saslMechanisms = features.getElementsByTagNameNS(Constants.NS_XMPP_SASL, 'mechanisms');
                 if (saslMechanisms[0]) {
                     xmppClient.handleSASL(saslMechanisms[0]);
                 }
             }
-            else if(xmppClient.bindDone == false)
-            {
+            else if (xmppClient.bindDone == false) {
+                console.log('stream: server exposes bind and client is not bound.');
                 // Bind is mandatory
-                let bindElement = features.getElementsByTagNameNS(Constants.NX_XMPP_BIND, 'bind');
-                if (bindElement[0]){
-
+                let bindElement = features.getElementsByTagNameNS(Constants.NS_XMPP_BIND, 'bind');
+                if (bindElement[0]) {
+                    xmppClient.handleBind(features);
                 }
             }
             break;

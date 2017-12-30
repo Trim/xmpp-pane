@@ -9,7 +9,7 @@ retrieveConfig = function () {
 
             if (localStorage.jid) {
                 config.jid = localStorage.jid;
-                config.fulljid = config.jid + '/xmpp-pane_' + Date.now();
+                config.fulljid = null;
                 let splitedJid = config.jid.split('@');
                 config.localpart = splitedJid[0];
                 config.domainpart = splitedJid[1];

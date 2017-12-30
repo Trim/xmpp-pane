@@ -24,6 +24,9 @@ class Constants {
     static get NS_XMPP_BIND() {
         return "urn:ietf:params:xml:ns:xmpp-bind";
     }
+    static get STANZA_IQ_VALID_TYPE() {
+        return ["get", "set", "result", "error"];
+    }
 
     /*
      * XMPP Subprotocol for WebSocket
