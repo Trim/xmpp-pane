@@ -5,7 +5,6 @@ retrieveConfig = function () {
         let config = {};
 
         function setJid(localStorage) {
-            console.log('xmpp-pane-main: local storage found jid: ' + localStorage.jid);
 
             if (localStorage.jid) {
                 config.jid = localStorage.jid;
@@ -13,16 +12,17 @@ retrieveConfig = function () {
                 let splitedJid = config.jid.split('@');
                 config.localpart = splitedJid[0];
                 config.domainpart = splitedJid[1];
-            }
 
-            console.log('xmpp-pane-main: full jid: ' + config.fulljid);
-            console.log('xmpp-pane-main: local part: ' + config.localpart);
+                console.log('xmpp-pane-main: jid: ' + config.jid);
+                console.log('xmpp-pane-main: local part: ' + config.localpart);
+                console.log('xmpp-pane-main: domain part: ' + config.domainpart);
+            }
         }
 
         function setPassword(localStorage) {
-            console.log('xmpp-pane-main: local storage found password!');
             if (localStorage.password) {
                 config.password = localStorage.password;
+                console.log('xmpp-pane-main: local storage found password.');
             }
         }
 
@@ -44,16 +44,73 @@ retrieveConfig = function () {
                         resolve(config);
                     }
                     else {
-                        reject(`xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first`);
+                        reject(`xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first.`);
                     }
                 }));
     });
 };
 
-retrieveConfig()
-    .then((_config) => {
-        let xmppPaneClient = new Client(_config);
-        _config = null;
+var xmppPaneClient = null;
 
-        xmppPaneClient.connect();
-    });
+xmppPaneMessageListener = function (message, sender, sendResponse) {
+    let asynchroneResponse = false;
+
+    switch (message) {
+    case 'isConfigured':
+        asynchroneResponse = true;
+        retrieveConfig()
+            .then(
+                function (config) {
+                    sendResponse({configured: true});
+                },
+                function (error) {
+                    sendResponse({configured: false});
+                }
+            );
+        break;
+
+    case 'isConnected':
+        if (xmppPaneClient) {
+            sendResponse({connected: xmppPaneClient.isConnected()});
+        }
+        else {
+            sendResponse({connected: false});
+        }
+        break;
+
+    case 'connect':
+        asynchroneResponse = true;
+        retrieveConfig()
+            .then(
+                function (_config) {
+                    xmppPaneClient = new Client(_config);
+                    _config = null;
+
+                    xmppPaneClient.connect()
+                        .then(
+                            function (connected) {
+                                sendResponse({success: true});
+                            },
+                            function (error) {
+                                sendResponse({
+                                    success: false,
+                                    error: error
+                                });
+                            });
+                },
+                function (error) {
+                    sendResponse({
+                        success: false,
+                        error: error
+                    });
+                }
+            );
+        break;
+    }
+
+    if (asynchroneResponse){
+        return true;
+    }
+}
+
+chrome.runtime.onMessage.addListener(xmppPaneMessageListener)

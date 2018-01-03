@@ -6,28 +6,22 @@
     </head>
 
     <body>
-        <div id="roster">
-            <h1>Contacts</h1>
-
-            <ul>
-                <li>Foo Online</li>
-                <li>Bar Online</li>
-            </ul>
-
-            <h2>Away</h2>
-            <ul>
-                <li>Foo Away</li>
-                <li>Bar Away</li>
-            </ul>
-
-            <h2>Offline</h2>
-            <ul>
-                <li>Foo Offline</li>
-                <li>Bar Offline</li>
-            </ul>
+        <div id="errorpanel" class="panel" style="padding:1rem;background-color:red;">
         </div>
 
-        <div id="pubsub">
+        <div id="firstrunpanel" class="panel">
+            <p>Welcome to XMPP Pane!</p>
+            <p>First, you'll have to configure first your XMPP account.</p>
+            <object type="text/html" style="width:100%;height:75%;" data="../options/options.html"></object>
+            <p>When you saved your configurations, <button class="connectClient">connect</button> and enjoy!</p>
+            <p style="font-size: 0.9rem">(this page will be available in extension preferences later)</p>
+        </div>
+
+        <div id="connectpanel" class="panel">
+            <p>You are disconnected, please <button class="connectClient">connect</button></p>
+        </div>
+
+        <div id="pubsubpanel" class="panel">
             <h1>Communities</h1>
             <a href="subscribe">Subscribe to new Community</a>
             <h2>Example.org</h2>
@@ -36,5 +30,7 @@
                 <li>Bar Example</li>
             </ul>
         </div>
+
+        <script src="panel.js"></script>
     </body>
 </html>

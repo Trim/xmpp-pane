@@ -24,6 +24,10 @@ class Client {
         this.stanzaId = 0;
     }
 
+    isConnected() {
+        return this.bindDone;
+    }
+
     connect() {
         return new Promise((resolve, reject) => {
 
