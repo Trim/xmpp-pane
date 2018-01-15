@@ -18,6 +18,7 @@ class Client {
         this.saslStep = 0;
         this.saslDone = false;
         this.bindDone = false;
+        this.bindError = null;
         this.tls = false;
         // Stanza sent waiting for acknowledgment and/or response
         this.stanzas = {};
@@ -26,6 +27,10 @@ class Client {
 
     isConnected() {
         return this.bindDone;
+    }
+
+    connectionError() {
+        return this.bindError;
     }
 
     connect() {
@@ -90,7 +95,9 @@ class Client {
                             xmppClient.send(openElement);
                         })
                         .then(() => {
-                            resolve();
+                            resolve({
+                                step: 'initialized'
+                            });
                         });
                 };
 
@@ -200,7 +207,7 @@ class Client {
             if (this.saslStep > 0) {
                 let failure = message.firstChild.nodeName;
                 console.log('stream authenticate failed with error: ' + failure);
-
+                this.bindError = 'stream authenticate failed with error: ' + failure;
                 this.close();
             }
             break;

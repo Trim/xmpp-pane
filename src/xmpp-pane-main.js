@@ -75,9 +75,25 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
 
     case 'isConnected':
         if (xmppPaneClient) {
-            sendResponse({
-                connected: xmppPaneClient.isConnected()
-            });
+            if (xmppPaneClient.isConnected()) {
+                sendResponse({
+                    connected: true
+                });
+            }
+            else {
+                let connectionError = xmppPaneClient.connectionError()
+                if (!connectionError) {
+                    sendResponse({
+                        step: 'initialized'
+                    });
+                }
+                else {
+                    sendResponse({
+                        connected: false,
+                        error: connectionError
+                    });
+                }
+            }
         }
         else {
             sendResponse({
@@ -96,21 +112,19 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
 
                     xmppPaneClient.connect()
                         .then(
-                            function (connected) {
-                                sendResponse({
-                                    success: true
-                                });
+                            function (initialized) {
+                                sendResponse(initialized);
                             },
                             function (error) {
                                 sendResponse({
-                                    success: false,
+                                    connected: false,
                                     error: error
                                 });
                             });
                 },
                 function (error) {
                     sendResponse({
-                        success: false,
+                        connected: false,
                         error: error
                     });
                 }

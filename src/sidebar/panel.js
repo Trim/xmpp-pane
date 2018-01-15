@@ -1,5 +1,6 @@
 panel = {
     error: document.getElementById('errorpanel'),
+    info: document.getElementById('infopanel'),
     connect: document.getElementById('connectpanel'),
     firstrun: document.getElementById('firstrunpanel'),
     pubsub: document.getElementById('pubsubpanel')
@@ -23,7 +24,7 @@ function displayFirstRun(response) {
 function displayConnect(response) {
     if (response.connected == true) {
         clientConnected({
-            success: true
+            connected: true
         });
     }
     else {
@@ -32,13 +33,22 @@ function displayConnect(response) {
 }
 
 function clientConnected(response) {
-    if (response.success == true) {
-        panel['firstrun'].style.display = 'none';
-        panel['connect'].style.display = 'none';
+    panel['info'].style.display = 'none';
+    panel['firstrun'].style.display = 'none';
+    panel['connect'].style.display = 'none';
+
+    if (response.step == 'initialized') {
+        panel['info'].style.display = 'block';
+        panel['info'].innerHTML = 'Client initiated connection with server. Waiting for authentication…'
+        window.setTimeout(checkConnection, 100);
+    }
+
+    if (response.connected == true) {
         panel['error'].style.display = 'none';
+        panel['info'].style.display = 'none';
         panel['pubsub'].style.display = 'block';
     }
-    else {
+    else if (response.connected == false) {
         panel['error'].style.display = 'block';
         panel['error'].innerHTML = response.error;
     }
@@ -46,6 +56,10 @@ function clientConnected(response) {
 
 function sendConnect(ev) {
     chrome.runtime.sendMessage('connect', clientConnected);
+}
+
+function checkConnection() {
+    chrome.runtime.sendMessage('isConnected', clientConnected);
 }
 
 connectButtons = document.getElementsByClassName('connectClient');
