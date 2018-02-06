@@ -1,16 +1,16 @@
 panel = {
-    error : document.getElementById('errorpanel'),
-    connect : document.getElementById('connectpanel'),
-    firstrun : document.getElementById('firstrunpanel'),
-    pubsub : document.getElementById('pubsubpanel')
+    error: document.getElementById('errorpanel'),
+    connect: document.getElementById('connectpanel'),
+    firstrun: document.getElementById('firstrunpanel'),
+    pubsub: document.getElementById('pubsubpanel')
 }
 
-for (let pane in panel){
+for (let pane in panel) {
     panel[pane].style.display = 'none';
 }
 
 function displayFirstRun(response) {
-    if(response.configured == true){
+    if (response.configured == true) {
         panel['firstrun'].style.display = 'none';
         chrome.runtime.sendMessage('isConnected', displayConnect);
     }
@@ -20,9 +20,11 @@ function displayFirstRun(response) {
     }
 }
 
-function displayConnect(response){
-    if(response.connected == true){
-        clientConnected({success: true});
+function displayConnect(response) {
+    if (response.connected == true) {
+        clientConnected({
+            success: true
+        });
     }
     else {
         panel['connect'].style.display = 'block';

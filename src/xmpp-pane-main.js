@@ -61,20 +61,28 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
         retrieveConfig()
             .then(
                 function (config) {
-                    sendResponse({configured: true});
+                    sendResponse({
+                        configured: true
+                    });
                 },
                 function (error) {
-                    sendResponse({configured: false});
+                    sendResponse({
+                        configured: false
+                    });
                 }
             );
         break;
 
     case 'isConnected':
         if (xmppPaneClient) {
-            sendResponse({connected: xmppPaneClient.isConnected()});
+            sendResponse({
+                connected: xmppPaneClient.isConnected()
+            });
         }
         else {
-            sendResponse({connected: false});
+            sendResponse({
+                connected: false
+            });
         }
         break;
 
@@ -89,7 +97,9 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
                     xmppPaneClient.connect()
                         .then(
                             function (connected) {
-                                sendResponse({success: true});
+                                sendResponse({
+                                    success: true
+                                });
                             },
                             function (error) {
                                 sendResponse({
@@ -108,7 +118,7 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
         break;
     }
 
-    if (asynchroneResponse){
+    if (asynchroneResponse) {
         return true;
     }
 }
