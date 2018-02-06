@@ -38,4 +38,12 @@ class Constants {
     static get NS_XMPP_FRAMING() {
         return "urn:ietf:params:xml:ns:xmpp-framing";
     }
+
+    /*
+     * XMPP Disco
+     * https://xmpp.org/extensions/xep-0030.html
+     */
+    static get NS_DISCO_INFO {
+        return "http://jabber.org/protocol/disco#info";
+    }
 }

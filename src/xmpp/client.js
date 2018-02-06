@@ -149,6 +149,10 @@ class Client {
             });
     }
 
+    pendingStanzas() {
+        return stanzas.keys();
+    }
+
     handleSASL(message) {
         console.log('client: handling SASL: ' + message.nodeName);
         switch (message.nodeName) {
@@ -238,6 +242,8 @@ class Client {
 
             iq.build(bind)
                 .then((iqElement) => {
+                    // TODO: Will this assignment work ? I expect "Yes", because I hope it saves a reference to the stanza and not the stanza itself
+                    this.stanzas[iq.id()] = iq;
                     this.send(iqElement);
                 });
             break;
@@ -250,6 +256,30 @@ class Client {
             this.config.fulljid = fulljid;
             console.log('client: bound done, full jid is: ' + this.config.fulljid);
             break;
+        }
+    }
+
+    discover(stanza = null) {
+        // Create request
+        if (!stanza) {
+            let iq = new IQ({
+                from: this.config.jid,
+                to: this.config.domainpart,
+                id: this.stanzaId++,
+                type: 'get'
+            });
+
+            let query = this.dom.createElementNS(Constants.NS_DISCO_INFO, 'query');
+
+            iq.build(query)
+                .then((iqElement) => {
+                    // TODO: Will this assignment work ? I expect "Yes", because I hope it saves a reference to the stanza and not the stanza itself
+                    this.stanzas[iq.id()] = iq;
+                    this.send(iqElement);
+                });
+        }
+        else {
+            // Handle Stanza 
         }
     }
 }

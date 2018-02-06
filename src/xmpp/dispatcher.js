@@ -35,22 +35,33 @@ class Dispatcher {
             switch (message.nodeName) {
             case 'iq':
                 console.log('dispatcher: IQ stanza received, looking unique child: ' + message.children[0].nodeName);
-                switch (message.children[0].nodeName) {
-                case 'bind':
-                    this.xmppClient.handleBind(message);
+
+                if (this.xmppClient.pendingStanzas.find((stanzaId) => {
+                        return stanzaId == message.id
+                    }) {
+                        // TODO: Check if we can use namespaceURI for the unique children
+                        switch (message.children[0].nodeName) {
+                        case 'bind':
+                            this.xmppClient.handleBind(message);
+                            break;
+                        case 'query':
+                            this.xmppClient.discover(message);
+                            break;
+                        default:
+                            console.log('dispatcher: unkown IQ element');
+                            break;
+                        }
+                    }
+                    else {
+                        console.err('dispatcher: client ' + this.xmppClient.fulljid + ' did not expect stanza id: ' + message.id);
+                    }
                     break;
-                default:
-                    console.log('dispatcher: unkown IQ element');
+
+                    default: console.log('dispatcher: uknown namespace and nodename, nothing todo.');
                     break;
+
                 }
                 break;
-
-            default:
-                console.log('dispatcher: uknown namespace and nodename, nothing todo.');
-                break;
-
             }
-            break;
         }
     }
-}
