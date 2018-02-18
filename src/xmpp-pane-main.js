@@ -113,7 +113,9 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
                     xmppPaneClient.connect()
                         .then(
                             function (initialized) {
-                                sendResponse(initialized);
+                                sendResponse({
+                                    step: 'initialized'
+                                });
                             },
                             function (error) {
                                 sendResponse({

@@ -43,7 +43,7 @@ class Constants {
      * XMPP Disco
      * https://xmpp.org/extensions/xep-0030.html
      */
-    static get NS_DISCO_INFO {
+    static get NS_DISCO_INFO() {
         return "http://jabber.org/protocol/disco#info";
     }
 }

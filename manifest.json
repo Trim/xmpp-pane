@@ -28,7 +28,6 @@
             "src/xmpp/core/presence.js",
             "src/xmpp/core/iq.js",
             "src/xmpp/server.js",
-            "src/xmpp/dispatcher.js",
             "src/xmpp/client.js",
             "src/xmpp-pane-main.js"
         ]

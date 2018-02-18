@@ -1,28 +1,79 @@
 /*
- * Implementation of an XMPP client.
+ * Client is responsible to create and keep the connection with the client's
+ * XMPP server.
+ *
+ * It will receive contracts from multiple sources (as the client itself, some
+ * pubsub nodes, ...).
+ * A contract is made of:
+ *  - an XML message to send on the XMPP network
+ *  - an expected response XML node name
+ *  - a promise consisting of to two callbacks (packed as a Promise):
+ *    - one action to run when a response is received and succeed
+ *    - one action to run on any error (error response received, network error, ...)
+ *
+ * It keeps a directory of all contracts which are waiting for responses.
  *
  * [RFC-6120]: https://xmpp.org/rfcs/rfc6120.html
  */
+
 class Client {
     constructor(_config) {
-        const xmppClient = this;
-        // external configuration
+        // XMPP configuration
         this.config = _config;
-        // toolbox
+
+        // DOM toolbox
         this.dom = document.implementation.createDocument(null, null);
+        this.domParser = new DOMParser();
         this.xmlSerializer = new XMLSerializer();
-        this.stream = null; // XMPP Framed Stream
+
+        // XMPP Framed Stream
+        this.stream = null;
         this.socket = null; // WebSocket
-        this.dispatcher = new Dispatcher(this); // WebSocket message dispatcher
-        // internal state
+
+        // Internal state
         this.saslStep = 0;
         this.saslDone = false;
         this.bindDone = false;
         this.bindError = null;
         this.tls = false;
-        // Stanza sent waiting for acknowledgment and/or response
-        this.stanzas = {};
-        this.stanzaId = 0;
+
+        // Contracts
+        this.contracts = {};
+        this.lastContractId = 0;
+    }
+
+    // Promising a contract
+    promise(_message, _nodeName) {
+        return new Promise((resolve, reject) => {
+            // Manage the contract
+            let contract = {
+                id: _message.id,
+                to: _message.to,
+                message: _message,
+                nodeName: _nodeName,
+                success: (response) => {
+                    resolve(response);
+                },
+                fail: (response) => {
+                    reject(response);
+                }
+            }
+
+            // TODO: Find better way to store contracts (maybe with "to" as key)
+            // and update handleContact too.
+            this.contracts[contract.id] = contract;
+
+            // Create a websocket if needed and execute the contract
+            if (!this.socket) {
+                this.connect()
+                    .then(() => {
+                        this.send(contract.message);
+                    });
+            }
+            else {
+                this.send(contract.message);
+            }
+        });
     }
 
     isConnected() {
@@ -36,12 +87,13 @@ class Client {
     connect() {
         return new Promise((resolve, reject) => {
 
-            function xrdFindWebsocketURL(xrdBody) {
+            // Helper to look on the web for a websocket URL
+            function xrdFindWebsocketURL(_xrdBody) {
                 return new Promise((resolve, reject) => {
                     let websocketURL = null;
 
                     let domParser = new DOMParser();
-                    let xrdDoc = domParser.parseFromString(xrdBody, "application/xml");
+                    let xrdDoc = domParser.parseFromString(_xrdBody, "application/xml");
 
                     let links = xrdDoc.getElementsByTagName("Link");
                     for (let linkid = 0; linkid < links.length; linkid++) {
@@ -64,16 +116,17 @@ class Client {
                 });
             }
 
-            function handshake(websocketURL) {
-                if (websocketURL.indexOf('wss') > -1) {
+            // Helper to initiate the WebSocket
+            function handshake(_websocketURL) {
+                if (_websocketURL.indexOf('wss://') == 0) {
                     xmppClient.tls = true;
                 }
                 else {
                     xmppClient.tls = false;
-                    reject('handshake: refusing to connect to ' + websocketURL + ' because TLS is not available');
+                    reject('handshake: refusing to connect to ' + _websocketURL + ' because TLS is not available.');
                 }
 
-                xmppClient.socket = new WebSocket(websocketURL, 'xmpp');
+                xmppClient.socket = new WebSocket(_websocketURL, 'xmpp');
 
                 xmppClient.socket.onopen = function (event) {
                     console.log('xmppClient.socket connected: ' + event);
@@ -95,14 +148,12 @@ class Client {
                             xmppClient.send(openElement);
                         })
                         .then(() => {
-                            resolve({
-                                step: 'initialized'
-                            });
+                            resolve();
                         });
                 };
 
                 xmppClient.socket.onmessage = function (event) {
-                    xmppClient.dispatcher.dispatch(event);
+                    xmppClient.onmessage(event);
                 }
 
                 xmppClient.socket.onerror = function (event) {
@@ -114,38 +165,24 @@ class Client {
                 };
             }
 
-            let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
+            let xmppClient = this;
 
-            const xmppClient = this;
+            // First look on secure connection for websocket URL
+            let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
             fetch(xrdURL)
-                .then(function (response) {
-                    return response.text();
+                .then(function (xrdResponse) {
+                    return xrdResponse.text();
                 })
                 .then(xrdFindWebsocketURL, function (error) {
                     let xrdURL = 'http://' + xmppClient.config.domainpart + '/.well-known/host-meta';
 
                     return fetch(xrdUrl)
-                        .then(function (response) {
-                            return response.text();
+                        .then(function (xrdResponse) {
+                            return xrdResponse.text();
                         });
                 })
                 .then(handshake);
         });
-    }
-
-    /*
-     * Send text message through websocket.
-     */
-    send(message) {
-        let messageText;
-        if (typeof (message) == 'string') {
-            messageText = message;
-        }
-        else {
-            messageText = this.xmlSerializer.serializeToString(message);
-        }
-        console.log('client: sending: ' + messageText);
-        this.socket.send(messageText);
     }
 
     close() {
@@ -156,13 +193,72 @@ class Client {
             });
     }
 
-    pendingStanzas() {
-        return stanzas.keys();
+    /*
+     * Sending messages directly through websocket
+     */
+    send(_message) {
+        let messageText;
+        if (typeof (_message) == 'string') {
+            messageText = _message;
+        }
+        else {
+            messageText = this.xmlSerializer.serializeToString(_message);
+        }
+        console.log('client: sending: ' + messageText);
+        this.socket.send(messageText);
     }
 
-    handleSASL(message) {
-        console.log('client: handling SASL: ' + message.nodeName);
-        switch (message.nodeName) {
+    /*
+     * Receiving message from the websocket and handle contracts linked to the message.
+     */
+    onmessage(_response) {
+        console.log('xmppClient: raw message received: ' + _response.data);
+
+        // TODO: On parsing error, close the stream
+        let message = this.domParser.parseFromString(_response.data, "text/xml").documentElement;
+        // TODO: Sanitize content before processing
+
+        switch (message.namespaceURI) {
+
+        case Constants.NS_XMPP_FRAMING:
+        case Constants.NS_JABBER_STREAM:
+            // Either type of streams are communicating without contracts
+            // Stream handler will ask the client to auhtenticate with SASL
+            // and to bind at the good time of Stream initialization.
+            this.stream.handle(this, message);
+            break;
+
+        case Constants.NS_XMPP_SASL:
+            // NS_XMPP_SASL is communicating without contracts
+            this.handleSASL(message);
+            break;
+
+        default:
+            console.log('xmppClient: unknown namespaceURI element: ' + message.namespaceURI);
+            console.log('xmppClient: looking for known nodeName: ' + message.nodeName)
+            switch (message.nodeName) {
+            case 'iq':
+                console.log('xmppClient: IQ stanza received, looking in contracts for id: ' + message.id);
+                console.log('xmppClient: The IQ unique child is named: ' + message.children[0].nodeName);
+                this.handleContract(message);
+                break;
+
+            default:
+                console.log('xmppClient: unknown namespace and nodename, nothing todo.');
+                break;
+            }
+            break;
+        }
+    }
+
+    /*
+     * SASL authentication
+     *
+     * This process is initiated by the XMPP Stream.
+     */
+    handleSASL(_message) {
+        console.log('client: authenticate with SASL: ' + _message.nodeName);
+        switch (_message.nodeName) {
 
         case 'mechanisms':
             // Start SASL negotiation
@@ -170,7 +266,7 @@ class Client {
 
             // First find client SASL Mechanism which is furnished by server
             let clientSASLMechanism = Constants.CLIENT_PREF_SASL_MECHANISM;
-            let purposedMechanisms = message.getElementsByTagName('mechanism');
+            let purposedMechanisms = _message.getElementsByTagName('mechanism');
 
             let serverSASLMechanism = [];
 
@@ -194,9 +290,9 @@ class Client {
                     let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
                     auth.setAttribute('mechanism', clientMechanism);
                     factory.getMessage(this.config.localpart, this.config.password, null)
-                        .then((saslMessage) => {
-                            console.log('saslMessage: ' + saslMessage);
-                            auth.innerHTML = saslMessage;
+                        .then((_saslMessage) => {
+                            console.log('saslMessage: ' + _saslMessage);
+                            auth.innerHTML = _saslMessage;
                             this.send(auth);
                         });
                 }
@@ -205,7 +301,7 @@ class Client {
 
         case 'failure':
             if (this.saslStep > 0) {
-                let failure = message.firstChild.nodeName;
+                let failure = _message.firstChild.nodeName;
                 console.log('stream authenticate failed with error: ' + failure);
                 this.bindError = 'stream authenticate failed with error: ' + failure;
                 this.close();
@@ -231,38 +327,63 @@ class Client {
         }
     }
 
-    handleBind(message) {
-        console.log('client: handling bind: ' + message.nodeName);
-        let bind;
-        switch (message.nodeName) {
-        case 'stream:features':
-            // On feature negotiation, ask to create our resource id
-            // as JavaScript and Web API can't easily create secure uuid
-            let iq = new IQ({
-                from: this.config.jid,
-                to: this.config.domainpart,
-                id: this.stanzaId++,
-                type: 'set'
+    /*
+     * client binding to XMPP server
+     *
+     * This process is initiated by the XMPP Stream.
+     */
+    bindStart(_mechanisms) {
+        console.log('client: bind: starting');
+
+        // Ask to create our resource id
+        // as JavaScript and Web API can't easily create secure uuid
+        let iq = new IQ({
+            from: this.config.jid,
+            to: this.config.domainpart,
+            id: this.lastContractId++,
+            type: 'set'
+        });
+
+        let bind = this.dom.createElementNS(Constants.NS_XMPP_BIND, 'bind');
+
+        iq.build(bind)
+            .then((iqElement) => {
+                this.promise(iqElement, 'iq')
+                    .then(
+                        (iqResponse) => {
+                            // Receive our resource id generated by the server
+                            this.config.fulljid = iqResponse.innerHTML;
+                            this.bindDone = true;
+                            console.log('client: bind: succeed, full jid is: ' + this.config.fulljid);
+                        },
+                        (bindError) => {
+                            console.log('client: bind: unknown error: ' + bindError.error);
+                        });
             });
+    }
 
-            bind = this.dom.createElementNS(Constants.NS_XMPP_BIND, 'bind');
-
-            iq.build(bind)
-                .then((iqElement) => {
-                    // TODO: Will this assignment work ? I expect "Yes", because I hope it saves a reference to the stanza and not the stanza itself
-                    this.stanzas[iq.id()] = iq;
-                    this.send(iqElement);
+    /*
+     * Check contract state and finish its execution according to the response received
+     */
+    handleContract(_message) {
+        if (Object.keys(this.contracts).find((contractId) => {
+                return contractId == _message.id
+            })) {
+            if (this.contracts[_message.id].nodeName == _message.nodeName) {
+                this.contracts[_message.id].success(_message);
+            }
+            else {
+                this.contracts[_message.id].fail({
+                    error: 'node name did not match: expected ['
+                        + this.contracts[_message.id].nodeName + ']'
+                        + ', received ['
+                        + _message.children[0].nodeName
+                        + ']'
                 });
-            break;
-
-        case 'iq':
-            // Receive our resource id generated by the server
-            bind = message.children[0];
-            let fulljid = bind.children[0].innerHTML;
-            this.bindDone = true;
-            this.config.fulljid = fulljid;
-            console.log('client: bound done, full jid is: ' + this.config.fulljid);
-            break;
+            }
+        }
+        else {
+            console.err('xmppClient: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
         }
     }
 
@@ -272,7 +393,7 @@ class Client {
             let iq = new IQ({
                 from: this.config.jid,
                 to: this.config.domainpart,
-                id: this.stanzaId++,
+                id: this.lastContractId++,
                 type: 'get'
             });
 
@@ -286,7 +407,7 @@ class Client {
                 });
         }
         else {
-            // Handle Stanza 
+            // Handle Stanza
         }
     }
 }
