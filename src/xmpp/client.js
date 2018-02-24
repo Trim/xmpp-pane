@@ -252,6 +252,31 @@ class Client {
     }
 
     /*
+     * Check contract state and finish its execution according to the response received
+     */
+    handleContract(_message) {
+        if (Object.keys(this.contracts).find((contractId) => {
+                return contractId == _message.id
+            })) {
+            if (this.contracts[_message.id].nodeName == _message.nodeName) {
+                this.contracts[_message.id].success(_message);
+            }
+            else {
+                this.contracts[_message.id].fail({
+                    error: 'node name did not match: expected ['
+                        + this.contracts[_message.id].nodeName + ']'
+                        + ', received ['
+                        + _message.children[0].nodeName
+                        + ']'
+                });
+            }
+        }
+        else {
+            console.err('xmppClient: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
+        }
+    }
+
+    /*
      * SASL authentication
      *
      * This process is initiated by the XMPP Stream.
@@ -332,7 +357,7 @@ class Client {
      *
      * This process is initiated by the XMPP Stream.
      */
-    bindStart(_mechanisms) {
+    bind() {
         console.log('client: bind: starting');
 
         // Ask to create our resource id
@@ -362,32 +387,7 @@ class Client {
             });
     }
 
-    /*
-     * Check contract state and finish its execution according to the response received
-     */
-    handleContract(_message) {
-        if (Object.keys(this.contracts).find((contractId) => {
-                return contractId == _message.id
-            })) {
-            if (this.contracts[_message.id].nodeName == _message.nodeName) {
-                this.contracts[_message.id].success(_message);
-            }
-            else {
-                this.contracts[_message.id].fail({
-                    error: 'node name did not match: expected ['
-                        + this.contracts[_message.id].nodeName + ']'
-                        + ', received ['
-                        + _message.children[0].nodeName
-                        + ']'
-                });
-            }
-        }
-        else {
-            console.err('xmppClient: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
-        }
-    }
-
-    discover(stanza = null) {
+    discover() {
         // Create request
         if (!stanza) {
             let iq = new IQ({
