@@ -26,6 +26,8 @@ class Stanza {
         if (!this.xmlSerializer) {
             this.xmlSerializer = new XMLSerializer();
         }
+
+        this.extendedAttributes = {};
     }
 
     /*
@@ -61,5 +63,12 @@ class Stanza {
 
     get type() {
         return this.attribute.type;
+    }
+
+    /*
+     * Extended attributes management
+     */
+    addExtendedAttribute(_name, _value) {
+        this.extendedAttributes[_name] = _value;
     }
 }

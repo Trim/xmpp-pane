@@ -142,7 +142,7 @@ class Stream {
                 // Bind is mandatory
                 let bindElement = features.getElementsByTagNameNS(Constants.NS_XMPP_BIND, 'bind');
                 if (bindElement[0]) {
-                    xmppClient.bindStart();
+                    xmppClient.bind();
                 }
             }
             break;

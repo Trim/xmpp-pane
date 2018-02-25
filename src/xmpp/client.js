@@ -258,6 +258,7 @@ class Client {
         if (Object.keys(this.contracts).find((contractId) => {
                 return contractId == _message.id
             })) {
+            // TODO: Add checks about namespaceURI too
             if (this.contracts[_message.id].nodeName == _message.nodeName) {
                 this.contracts[_message.id].success(_message);
             }
@@ -387,27 +388,50 @@ class Client {
             });
     }
 
-    discover() {
-        // Create request
-        if (!stanza) {
-            let iq = new IQ({
-                from: this.config.jid,
-                to: this.config.domainpart,
-                id: this.lastContractId++,
-                type: 'get'
+    /*
+     * Discover an Entity
+     *
+     * Node attribute is optional
+     */
+    discover(_entity, _node = null) {
+        console.log('client: discover: starting');
+
+        let iq = new IQ({
+            from: this.config.jid,
+            to: _entity,
+            id: this.lastContractId++,
+            type: 'get'
+        });
+
+        if (_node) {
+            iq.addExtendedAttribute('node', _node);
+        }
+
+        let query = this.dom.createElementNS(Constants.NS_DISCO_INFO, 'query');
+
+        iq.build(query)
+            .then((iqElement) => {
+                // TODO: Add expected namespace as Constants.NS_DISCO_INFO
+                this.promise(iqElement, 'iq')
+                    .then(
+                        (iqResponse) => {
+                            let entity = new Entity();
+                            let identities = iqResponse.getElementsByTagName('identity');
+                            let features = iqResponse.getElementsByTagName('feature');
+
+                            for (let i = 0; i < identities.length; i++){
+                                entity.addFeature(identities[i]);
+                            }
+
+                            for (let i = 0; i < features.length; i++){
+                                entity.addFeature(features[i]);
+                            }
+
+                            console.log('client: discover: succeed: ' + entity);
+                        },
+                        (bindError) => {
+                            console.log('client: discover: unknown error: ' + bindError.error);
+                        });
             });
-
-            let query = this.dom.createElementNS(Constants.NS_DISCO_INFO, 'query');
-
-            iq.build(query)
-                .then((iqElement) => {
-                    // TODO: Will this assignment work ? I expect "Yes", because I hope it saves a reference to the stanza and not the stanza itself
-                    this.stanzas[iq.id()] = iq;
-                    this.send(iqElement);
-                });
-        }
-        else {
-            // Handle Stanza
-        }
     }
 }

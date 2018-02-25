@@ -20,6 +20,10 @@ class IQ extends Stanza {
 
             iq.setAttribute('id', this.id);
 
+            for (let key of Object.keys(this.extendedAttributes)){
+                iq.setAttribute(key, this.extendedAttributes[key]);
+            }
+
             if (!Constants.STANZA_IQ_VALID_TYPE.find((type) => {
                     return type == this.type
                 })) {
