@@ -1,0 +1,21 @@
+# EditorConfig: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# For all files
+# - Unix EOF
+# - Keep an empty line at end of files
+# - charset is UTF-8
+# - indetation is made of 4 spaces
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# Makefile requires tabs for indentation
+[Makefile]
+indent_style = tab
