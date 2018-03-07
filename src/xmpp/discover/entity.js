@@ -1,6 +1,10 @@
 /*
  * Entity as defined by XMPP Discover
  *
+ * This class is used to parse data received from XMPP Discover.
+ * Data will be saved then in the Network.
+ * Then instances of this class are droped.
+ *
  * [XEP-0030](https://xmpp.org/extensions/xep-0030.html)
  */
 class Entity {
@@ -9,11 +13,6 @@ class Entity {
         // Features and protocols supported by the entity
         this.features = [];
         this.protocols = {};
-        // Items owned by the entity
-        this.items = {};
-
-        // Childs are Entity linked to this one
-        this.childs = {};
     }
 
     /*
@@ -27,7 +26,7 @@ class Entity {
 
         let identity;
         let found = false;
-        for (identity of this.identities){
+        for (let identity of this.identities){
             if (identity.type === type
                 && identity.category === category)
             {
