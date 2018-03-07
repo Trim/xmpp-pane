@@ -52,7 +52,7 @@ retrieveConfig = function () {
 
 var xmppPaneClient = null;
 
-xmppPaneMessageListener = function (message, sender, sendResponse) {
+xmppClientListener = function (message, sender, sendResponse) {
     let asynchroneResponse = false;
 
     switch (message) {
@@ -139,4 +139,4 @@ xmppPaneMessageListener = function (message, sender, sendResponse) {
     }
 }
 
-chrome.runtime.onMessage.addListener(xmppPaneMessageListener)
+chrome.runtime.onMessage.addListener(xmppClientListener)

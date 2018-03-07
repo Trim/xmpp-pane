@@ -68,4 +68,16 @@ for (let key = 0; key < connectButtons.length; key++) {
     connectButtons[key].onclick = sendConnect;
 }
 
+let panelListener = function(message, sender, sendRepsone) {
+    let asynchroneResponse = false;
+
+    if (message == "refreshNetwork") {
+        // TODO: Update network panel if it's the current one
+    }
+
+    return asynchroneResponse;
+}
+
+chrome.runtime.onMessage.addListener(panelListener)
+
 chrome.runtime.sendMessage('isConfigured', displayFirstRun);
