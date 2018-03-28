@@ -20,6 +20,9 @@ class Client {
     constructor(_config) {
         // XMPP configuration
         this.config = _config;
+        // Only the client needs to handle password (via SASL)
+        this.password = _config.password;
+        delete this.config.password;
 
         // DOM toolbox
         this.dom = document.implementation.createDocument(null, null);
@@ -315,7 +318,7 @@ class Client {
 
                     let auth = this.dom.createElementNS(Constants.NS_XMPP_SASL, 'auth');
                     auth.setAttribute('mechanism', clientMechanism);
-                    factory.getMessage(this.config.localpart, this.config.password, null)
+                    factory.getMessage(this.config.localpart, this.password, null)
                         .then((_saslMessage) => {
                             console.log('saslMessage: ' + _saslMessage);
                             auth.innerHTML = _saslMessage;
