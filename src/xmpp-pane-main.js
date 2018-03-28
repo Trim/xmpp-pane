@@ -41,6 +41,7 @@ retrieveConfig = function () {
                         && config.localpart
                         && config.domainpart
                         && config.password) {
+                        config.xmllang = browser.i18n.getUILanguage();
                         resolve(config);
                     }
                     else {
