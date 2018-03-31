@@ -13,7 +13,7 @@ function saveOptions(e) {
 
     // Save new password if required
     let passwordInput = document.querySelector("#password");
-    if (passwordInput) {
+    if (passwordInput && passwordInput.value !== '') {
         // TODO Currently, we only implement PLAIN authentication, so we need PLAIN password
         //let bufferPassword = new TextEncoder("utf-8").encode(passwordInput.value);
         //crypto.subtle.digest('SHA-512', bufferPassword)
@@ -30,7 +30,7 @@ function saveOptions(e) {
     });
 
     // Try to connect
-    chrome.runtime.sendMessage('connect');
+    browser.runtime.sendMessage({'from': 'options', 'subject': 'connect'});
 }
 
 function restoreOptions() {

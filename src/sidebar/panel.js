@@ -13,7 +13,7 @@ for (let pane in panel) {
 function displayFirstRun(response) {
     if (response.configured == true) {
         panel['firstrun'].style.display = 'none';
-        chrome.runtime.sendMessage('isConnected', displayConnect);
+        chrome.runtime.sendMessage({'from': 'panel', 'subject': 'isConnected'}, displayConnect);
     }
     else {
         panel['firstrun'].style.display = 'block';
@@ -40,10 +40,9 @@ function clientConnected(response) {
     if (response.step == 'initialized') {
         panel['info'].style.display = 'block';
         panel['info'].innerHTML = 'Client initiated connection with server. Waiting for authentication…'
-        window.setTimeout(checkConnection, 100);
+        checkConnection();
     }
-
-    if (response.connected == true) {
+    else if (response.connected == true) {
         panel['error'].style.display = 'none';
         panel['info'].style.display = 'none';
         panel['pubsub'].style.display = 'block';
@@ -55,11 +54,11 @@ function clientConnected(response) {
 }
 
 function sendConnect(ev) {
-    chrome.runtime.sendMessage('connect', clientConnected);
+    browser.runtime.sendMessage({'from': 'panel', 'subject': 'connect'}, clientConnected);
 }
 
 function checkConnection() {
-    chrome.runtime.sendMessage('isConnected', clientConnected);
+    browser.runtime.sendMessage({'from': 'panel', 'subject': 'isConnected'}, clientConnected);
 }
 
 connectButtons = document.getElementsByClassName('connectClient');
@@ -71,13 +70,20 @@ for (let key = 0; key < connectButtons.length; key++) {
 let panelListener = function (message, sender, sendRepsone) {
     let asynchroneResponse = false;
 
-    if (message == "refreshNetwork") {
-        // TODO: Update network panel if it's the current one
+    switch (message.subject) {
+        case "clientInitialized":
+            if (message.from === 'xmpp-pane') {
+                checkConnection();
+            }
+            break;
+        case "refreshNetwork":
+            // TODO: Update network panel if it's the current one
+            break;
     }
 
     return asynchroneResponse;
 }
 
-chrome.runtime.onMessage.addListener(panelListener)
+browser.runtime.onMessage.addListener(panelListener)
 
-chrome.runtime.sendMessage('isConfigured', displayFirstRun);
+browser.runtime.sendMessage({'from': 'panel', 'subject': 'isConfigured'}, displayFirstRun);

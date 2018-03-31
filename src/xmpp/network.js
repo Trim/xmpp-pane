@@ -69,7 +69,7 @@ class Network {
             break;
         }
 
-        chrome.runtime.sendMessage("refreshNetwork");
+        browser.runtime.sendMessage({'subject': 'refreshNetwork'});
     }
 
     /*

@@ -51,12 +51,12 @@ retrieveConfig = function () {
     });
 };
 
-var xmppPaneClient = null;
+let xmppPaneClient = null;
 
 xmppClientListener = function (message, sender, sendResponse) {
     let asynchroneResponse = false;
 
-    switch (message) {
+    switch (message.subject) {
     case 'isConfigured':
         asynchroneResponse = true;
         retrieveConfig()
@@ -114,6 +114,10 @@ xmppClientListener = function (message, sender, sendResponse) {
                     xmppPaneClient.connect()
                         .then(
                             function (initialized) {
+                                if (message.from !== 'panel') {
+                                    browser.runtime.sendMessage({'from': 'xmpp-pane', 'subject': 'clientInitialized'})
+                                }
+
                                 sendResponse({
                                     step: 'initialized'
                                 });
@@ -140,4 +144,4 @@ xmppClientListener = function (message, sender, sendResponse) {
     }
 }
 
-chrome.runtime.onMessage.addListener(xmppClientListener)
+browser.runtime.onMessage.addListener(xmppClientListener)
