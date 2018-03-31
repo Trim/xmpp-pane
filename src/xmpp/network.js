@@ -42,6 +42,7 @@ class Network {
                             service["leaves"] = new Map();
                             this.pubsub.set(_netElement.jid, service);
                         }
+                    }
                 }
 
                 if (this.pubsub.has(_netElement.jid)){
