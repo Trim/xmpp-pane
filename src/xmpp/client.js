@@ -40,6 +40,9 @@ class Client {
         this.bindError = null;
         this.tls = false;
 
+        // XMPP Network discovered
+        this.xmppNet = new Network(this.config.xmllang);
+
         // Contracts
         this.contracts = {};
         this.lastContractId = 0;
@@ -395,11 +398,16 @@ class Client {
      * Discover an Entity
      *
      * Node attribute is optional
+     * This is WIP and will be replaced by "discoverPubSubService"
+     * the idea will be to:
+     *   * disco#info on service name
+     *   * disco#items on first level of service
+     *   * disco#info on each of discovered node of first level service
      */
-    discover(_entity, _node = null) {
-        console.log('client: discover: starting');
+    discoPubsubService (_entity, _node = null) {
+        console.log('client: discoPubsubService: starting');
 
-        let iq = new IQ({
+        let iqinfo = new IQ({
             from: this.config.jid,
             to: _entity,
             id: this.lastContractId++,
@@ -407,18 +415,18 @@ class Client {
         });
 
         if (_node) {
-            iq.addExtendedAttribute('node', _node);
+            iqInfo.addExtendedAttribute('node', _node);
         }
 
         let query = this.dom.createElementNS(Constants.NS_DISCO_INFO, 'query');
 
-        iq.build(query)
-            .then((iqElement) => {
+        iqInfo.build(query)
+            .then((iqInfoService) => {
                 // TODO: Add expected namespace as Constants.NS_DISCO_INFO
-                this.promise(iqElement, 'iq')
+                this.promise(iqInfoService, 'iq')
                     .then(
                         (iqResponse) => {
-                            let entity = new Entity();
+                            let entity = new Entity(iqResponse.getElementsByTagName('iq')[0].getAttribute('from'));
                             let identities = iqResponse.getElementsByTagName('identity');
                             let features = iqResponse.getElementsByTagName('feature');
 
@@ -430,10 +438,10 @@ class Client {
                                 entity.addFeature(features[i]);
                             }
 
-                            console.log('client: discover: succeed: ' + entity);
+                            console.log('client: discoPubsubService: succeed: ' + entity);
                         },
                         (bindError) => {
-                            console.log('client: discover: unknown error: ' + bindError.error);
+                            console.log('client: discoPubsubService: unknown error: ' + bindError.error);
                         });
             });
     }

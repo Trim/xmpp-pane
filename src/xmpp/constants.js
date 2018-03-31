@@ -46,4 +46,7 @@ class Constants {
     static get NS_DISCO_INFO() {
         return "http://jabber.org/protocol/disco#info";
     }
+    static get NS_DISCO_ITEMS() {
+        return "http://jabber.org/protocol/disco#items";
+    }
 }
