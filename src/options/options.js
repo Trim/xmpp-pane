@@ -28,6 +28,9 @@ function saveOptions(e) {
     browser.storage.local.set({
         jid: document.querySelector("#jid").value
     });
+
+    // Try to connect
+    chrome.runtime.sendMessage('connect');
 }
 
 function restoreOptions() {

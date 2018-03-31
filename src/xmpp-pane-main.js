@@ -45,7 +45,7 @@ retrieveConfig = function () {
                         resolve(config);
                     }
                     else {
-                        reject(`xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first.`);
+                        reject("xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first.");
                     }
                 }));
     });

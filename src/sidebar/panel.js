@@ -50,7 +50,7 @@ function clientConnected(response) {
     }
     else if (response.connected == false) {
         panel['error'].style.display = 'block';
-        panel['error'].innerHTML = response.error;
+        panel['error'].innerHTML = response.error + '<br/>You could try to <a href="../options/options.html">modify</a> your settings';
     }
 }
 
