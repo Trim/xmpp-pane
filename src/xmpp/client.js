@@ -404,7 +404,7 @@ class Client {
      *   * disco#items on first level of service
      *   * disco#info on each of discovered node of first level service
      */
-    discoPubsubService (_entity, _node = null) {
+    discoPubsubService(_entity, _node = null) {
         console.log('client: discoPubsubService: starting');
 
         let iqinfo = new IQ({
@@ -430,11 +430,11 @@ class Client {
                             let identities = iqResponse.getElementsByTagName('identity');
                             let features = iqResponse.getElementsByTagName('feature');
 
-                            for (let i = 0; i < identities.length; i++){
+                            for (let i = 0; i < identities.length; i++) {
                                 entity.addFeature(identities[i]);
                             }
 
-                            for (let i = 0; i < features.length; i++){
+                            for (let i = 0; i < features.length; i++) {
                                 entity.addFeature(features[i]);
                             }
 

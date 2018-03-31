@@ -68,7 +68,7 @@ for (let key = 0; key < connectButtons.length; key++) {
     connectButtons[key].onclick = sendConnect;
 }
 
-let panelListener = function(message, sender, sendRepsone) {
+let panelListener = function (message, sender, sendRepsone) {
     let asynchroneResponse = false;
 
     if (message == "refreshNetwork") {

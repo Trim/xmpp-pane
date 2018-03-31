@@ -29,7 +29,11 @@ class Entity {
         let name = _identity.getAttribute('name');
         let node = _identity.getAttribute('node');
 
-        let idKey = {'type': type, 'category': category, 'node': node};
+        let idKey = {
+            'type': type,
+            'category': category,
+            'node': node
+        };
         let identity = this.identities.get(idKey)
 
         if (identity) {

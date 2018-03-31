@@ -20,7 +20,7 @@ class IQ extends Stanza {
 
             iq.setAttribute('id', this.id);
 
-            for (let key of Object.keys(this.extendedAttributes)){
+            for (let key of Object.keys(this.extendedAttributes)) {
                 iq.setAttribute(key, this.extendedAttributes[key]);
             }
 
