@@ -9,13 +9,13 @@
  */
 class Entity {
     constructor(_jid) {
-        this.jid = _id;
+        this.jid = _jid;
         // Services supported by the Entity
         // key: category and type of the identity
         // value: identity name
         this.identities = new Map();
         // Features and protocols supported by the entity
-        this.features = new Map();
+        this.features = [];
         this.protocols = new Map();
     }
 

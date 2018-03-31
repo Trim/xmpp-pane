@@ -407,7 +407,7 @@ class Client {
     discoPubsubService(_entity, _node = null) {
         console.log('client: discoPubsubService: starting');
 
-        let iqinfo = new IQ({
+        let iqInfo = new IQ({
             from: this.config.jid,
             to: _entity,
             id: this.lastContractId++,
@@ -426,7 +426,7 @@ class Client {
                 this.promise(iqInfoService, 'iq')
                     .then(
                         (iqResponse) => {
-                            let entity = new Entity(iqResponse.getElementsByTagName('iq')[0].getAttribute('from'));
+                            let entity = new Entity(iqResponse.getAttribute('from'));
                             let identities = iqResponse.getElementsByTagName('identity');
                             let features = iqResponse.getElementsByTagName('feature');
 
