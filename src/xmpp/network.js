@@ -17,6 +17,7 @@ class Network {
 
         // key: serviceid (jid?)
         // object: array(metaData, nodeMap, collectionMap, leafMap)
+        // metaData:  name (string), features (set)
         this.pubsub = new Map();
 
         // key: serviceid
@@ -28,18 +29,19 @@ class Network {
         switch (typeof (_netElement)) {
         case 'Entity':
 
-            for (let [idKey, idValue] of _netElement.identities) {
+            for (let [idKey, idValue] of _netElement.identityMap) {
                 if (idKey.xmllang == 'en'
                     || idKey.xmllang == this.xmllang) {
 
                     // If pubsub service is discoverd save it on the pubsub/services path
                     if (idKey.type == "pubsub"
                         && idKey.category == "service") {
-                        let service = [];
-                        service["metaData"] = [];
-                        service["metaData"]["name"] = idValue;
-                        service["collections"] = new Map();
-                        service["leaves"] = new Map();
+                        let service = new Map();
+                        service.set("metaData", new Map());
+                        service.get("metaData").set("name", idValue);
+                        service.get("metaData").set("features", new Set());
+                        service.set("collections", new Map());
+                        service.set("leaves", new Map());
                         this.pubsub.set(_netElement.jid, service);
                     }
                 }
@@ -50,26 +52,26 @@ class Network {
                 for (let [idKey, idValue] of _netElement.identities) {
                     if (idKey.type == "pubsub"
                         && idKey.category == "collection") {
-                        service["collections"].set(idKey.node, []);
+                        service.get("collections").set(idKey.node, new Map());
                     }
 
                     if (idKey.type == "pubsub"
                         && idKey.category == "leaf") {
-                        service["leaves"].set(idKey.node, []);
+                        service.get("leaves").set(idKey.node, new Map());
                     }
                 }
             }
 
-            for (let feature of _netElement.features) {
-                let featureNode = entityNode.createElement("feature");
-                featureNode.addAttribute("type", feature)
-
+            for (let feature of _netElement.featureSet) {
                 // TODO: decide which features to track and how to use them
+                service.get("metaData").get("features").add(feature);
             }
             break;
         }
 
-        browser.runtime.sendMessage({'subject': 'refreshNetwork'});
+        browser.runtime.sendMessage({
+            'subject': 'refreshNetwork'
+        });
     }
 
     /*

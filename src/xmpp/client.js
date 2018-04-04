@@ -48,6 +48,10 @@ class Client {
         this.lastContractId = 0;
     }
 
+    get network() {
+        return this.xmppNet;
+    }
+
     // Promising a contract
     promise(_message, _nodeName) {
         return new Promise((resolve, reject) => {
@@ -439,6 +443,8 @@ class Client {
                             }
 
                             console.log('client: discoPubsubService: succeed: ' + entity);
+
+                            this.xmppNet.registerService(entity);
                         },
                         (bindError) => {
                             console.log('client: discoPubsubService: unknown error: ' + bindError.error);

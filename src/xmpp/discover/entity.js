@@ -15,13 +15,20 @@ class Entity {
         // value: identity name
         this.identities = new Map();
         // Features and protocols supported by the entity
-        this.features = [];
+        this.features = new Set();
         this.protocols = new Map();
+    }
+
+    get identityMap() {
+        return this.identities;
+    }
+
+    get featureSet() {
+        return this.features;
     }
 
     /*
      * _identity is a <identity> XML Node
-     * _xmllang is the client preerend language
      */
     addIdentity(_identity) {
         let type = _identity.getAttribute('type');
@@ -48,6 +55,6 @@ class Entity {
      * _feature is a <feature> XML Node
      */
     addFeature(_feature) {
-        this.features.push(_feature.getAttribute('var'));
+        this.features.add(_feature.getAttribute('var'));
     }
 }
