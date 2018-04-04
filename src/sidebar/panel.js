@@ -13,7 +13,10 @@ for (let pane in panel) {
 function displayFirstRun(response) {
     if (response.configured == true) {
         panel['firstrun'].style.display = 'none';
-        chrome.runtime.sendMessage({'from': 'panel', 'subject': 'isConnected'}, displayConnect);
+        chrome.runtime.sendMessage({
+            'from': 'panel',
+            'subject': 'isConnected'
+        }, displayConnect);
     }
     else {
         panel['firstrun'].style.display = 'block';
@@ -54,11 +57,17 @@ function clientConnected(response) {
 }
 
 function sendConnect(ev) {
-    browser.runtime.sendMessage({'from': 'panel', 'subject': 'connect'}, clientConnected);
+    browser.runtime.sendMessage({
+        'from': 'panel',
+        'subject': 'connect'
+    }, clientConnected);
 }
 
 function checkConnection() {
-    browser.runtime.sendMessage({'from': 'panel', 'subject': 'isConnected'}, clientConnected);
+    browser.runtime.sendMessage({
+        'from': 'panel',
+        'subject': 'isConnected'
+    }, clientConnected);
 }
 
 connectButtons = document.getElementsByClassName('connectClient');
@@ -71,14 +80,14 @@ let panelListener = function (message, sender, sendRepsone) {
     let asynchroneResponse = false;
 
     switch (message.subject) {
-        case "clientInitialized":
-            if (message.from === 'xmpp-pane') {
-                checkConnection();
-            }
-            break;
-        case "refreshNetwork":
-            // TODO: Update network panel if it's the current one
-            break;
+    case "clientInitialized":
+        if (message.from === 'xmpp-pane') {
+            checkConnection();
+        }
+        break;
+    case "refreshNetwork":
+        // TODO: Update network panel if it's the current one
+        break;
     }
 
     return asynchroneResponse;
@@ -86,4 +95,7 @@ let panelListener = function (message, sender, sendRepsone) {
 
 browser.runtime.onMessage.addListener(panelListener)
 
-browser.runtime.sendMessage({'from': 'panel', 'subject': 'isConfigured'}, displayFirstRun);
+browser.runtime.sendMessage({
+    'from': 'panel',
+    'subject': 'isConfigured'
+}, displayFirstRun);

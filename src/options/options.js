@@ -30,7 +30,10 @@ function saveOptions(e) {
     });
 
     // Try to connect
-    browser.runtime.sendMessage({'from': 'options', 'subject': 'connect'});
+    browser.runtime.sendMessage({
+        'from': 'options',
+        'subject': 'connect'
+    });
 }
 
 function restoreOptions() {

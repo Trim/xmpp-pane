@@ -115,7 +115,10 @@ xmppClientListener = function (message, sender, sendResponse) {
                         .then(
                             function (initialized) {
                                 if (message.from !== 'panel') {
-                                    browser.runtime.sendMessage({'from': 'xmpp-pane', 'subject': 'clientInitialized'})
+                                    browser.runtime.sendMessage({
+                                        'from': 'xmpp-pane',
+                                        'subject': 'clientInitialized'
+                                    })
                                 }
 
                                 sendResponse({
