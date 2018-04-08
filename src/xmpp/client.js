@@ -411,46 +411,55 @@ class Client {
      *   * disco#info on each of discovered node of first level service
      */
     discoPubsubService(_entity, _node = null) {
-        console.log('client: discoPubsubService: starting');
+        return new Promise((resolve, reject) => {
+            console.log('client: discoPubsubService: starting');
 
-        let iqInfo = new IQ({
-            from: this.config.jid,
-            to: _entity,
-            id: this.lastContractId++,
-            type: 'get'
-        });
-
-        if (_node) {
-            iqInfo.addExtendedAttribute('node', _node);
-        }
-
-        let query = this.dom.createElementNS(Constants.NS_DISCO_INFO, 'query');
-
-        iqInfo.build(query)
-            .then((iqInfoService) => {
-                // TODO: Add expected namespace as Constants.NS_DISCO_INFO
-                this.promise(iqInfoService, 'iq')
-                    .then(
-                        (iqResponse) => {
-                            let entity = new Entity(iqResponse.getAttribute('from'));
-                            let identities = iqResponse.getElementsByTagName('identity');
-                            let features = iqResponse.getElementsByTagName('feature');
-
-                            for (let i = 0; i < identities.length; i++) {
-                                entity.addFeature(identities[i]);
-                            }
-
-                            for (let i = 0; i < features.length; i++) {
-                                entity.addFeature(features[i]);
-                            }
-
-                            console.log('client: discoPubsubService: succeed: ' + entity);
-
-                            this.xmppNet.registerService(entity);
-                        },
-                        (bindError) => {
-                            console.log('client: discoPubsubService: unknown error: ' + bindError.error);
-                        });
+            let iqInfo = new IQ({
+                from: this.config.jid,
+                to: _entity,
+                id: this.lastContractId++,
+                type: 'get'
             });
+
+            if (_node) {
+                iqInfo.addExtendedAttribute('node', _node);
+            }
+
+            let query = this.dom.createElementNS(Constants.NS_DISCO_INFO, 'query');
+
+            iqInfo.build(query)
+                .then((iqInfoService) => {
+                    // TODO: Add expected namespace as Constants.NS_DISCO_INFO
+                    this.promise(iqInfoService, 'iq')
+                        .then(
+                            (iqResponse) => {
+                                let entity = new Entity(iqResponse.getAttribute('from'));
+                                let identities = iqResponse.getElementsByTagName('identity');
+                                let features = iqResponse.getElementsByTagName('feature');
+
+                                for (let i = 0; i < identities.length; i++) {
+                                    entity.addFeature(identities[i]);
+                                }
+
+                                for (let i = 0; i < features.length; i++) {
+                                    entity.addFeature(features[i]);
+                                }
+
+                                console.log('client: discoPubsubService: succeed: ' + entity);
+
+                                this.xmppNet.registerService(entity);
+                            },
+                            (error) => {
+                                reject('client: discoPubsubService: unknown error: ' + error);
+                            })
+                        .then(
+                            (result) => {
+                                resolve(this.xmppNet)
+                            },
+                            (error) => {
+                                reject('client was not able to discover pubsub service: ' + _entity);
+                            });
+                })
+        });
     }
 }

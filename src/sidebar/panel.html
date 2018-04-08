@@ -24,12 +24,13 @@
 
         <div id="pubsubpanel" class="panel">
             <h1>Communities</h1>
-            <a href="subscribe">Subscribe to new Community</a>
-            <h2>Example.org</h2>
-            <ul>
-                <li>Foo Example</li>
-                <li>Bar Example</li>
-            </ul>
+            <form id='explore'>
+                <label for="exploreServer">Server:</label><input id="exploreServer" type="text"></input>
+                <button type="send">explore</button>
+            </form>
+
+            <div id="xmppNet"></div>
+
         </div>
 
         <script src="panel.js"></script>

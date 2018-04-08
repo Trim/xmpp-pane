@@ -26,9 +26,8 @@ class Network {
     }
 
     registerService(_netElement) {
-        switch (typeof (_netElement)) {
-        case 'Entity':
-
+        if (_netElement instanceof Entity) {
+            // Look for identities
             for (let [idKey, idValue] of _netElement.identityMap) {
                 if (idKey.xmllang == 'en'
                     || idKey.xmllang == this.xmllang) {
@@ -47,8 +46,11 @@ class Network {
                 }
             }
 
+            // Fill the pubusb service
             if (this.pubsub.has(_netElement.jid)) {
                 let service = this.pubsub.get(_netElement.jid);
+
+                // Look for collections and leaves
                 for (let [idKey, idValue] of _netElement.identities) {
                     if (idKey.type == "pubsub"
                         && idKey.category == "collection") {
@@ -62,11 +64,18 @@ class Network {
                 }
             }
 
-            for (let feature of _netElement.featureSet) {
-                // TODO: decide which features to track and how to use them
-                service.get("metaData").get("features").add(feature);
+            // Look for features
+            let service = null;
+            if (this.pubsub.has(_netElement.jid)) {
+                let service = this.pubsub.get(_netElement.jid);
             }
-            break;
+
+            if (service){
+                for (let feature of _netElement.featureSet) {
+                    // TODO: decide which features to track and how to use them
+                    service.get("metaData").get("features").add(feature);
+                }
+            }
         }
 
         browser.runtime.sendMessage({

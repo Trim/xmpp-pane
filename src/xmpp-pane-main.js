@@ -61,12 +61,12 @@ xmppClientListener = function (message, sender, sendResponse) {
         asynchroneResponse = true;
         retrieveConfig()
             .then(
-                function (config) {
+                (config) => {
                     sendResponse({
                         configured: true
                     });
                 },
-                function (error) {
+                (error) => {
                     sendResponse({
                         configured: false
                     });
@@ -107,13 +107,13 @@ xmppClientListener = function (message, sender, sendResponse) {
         asynchroneResponse = true;
         retrieveConfig()
             .then(
-                function (_config) {
+                (_config) => {
                     xmppPaneClient = new Client(_config);
                     _config = null;
 
                     xmppPaneClient.connect()
                         .then(
-                            function (initialized) {
+                            (initialized) => {
                                 if (message.from !== 'panel') {
                                     browser.runtime.sendMessage({
                                         'from': 'xmpp-pane',
@@ -125,20 +125,38 @@ xmppClientListener = function (message, sender, sendResponse) {
                                     step: 'initialized'
                                 });
                             },
-                            function (error) {
+                            (error) => {
                                 sendResponse({
                                     connected: false,
                                     error: error
                                 });
                             });
                 },
-                function (error) {
+                (error) => {
                     sendResponse({
                         connected: false,
                         error: error
                     });
                 }
             );
+        break;
+
+    case 'exploreServer':
+        asynchroneResponse = true;
+        xmppPaneClient.discoPubsubService(message.payload)
+            .then(
+                (network) => {
+                    sendResponse({
+                        'step': 'discovered',
+                        'network': xmppPaneClient.network
+                    });
+                },
+                (error) => {
+                    sendResponse({
+                        'step': 'discovered',
+                        'error': error
+                    });
+                });
         break;
     }
 

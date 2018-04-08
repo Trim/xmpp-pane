@@ -70,11 +70,37 @@ function checkConnection() {
     }, clientConnected);
 }
 
+function refreshNetwork(network) {
+    if (network) {
+        let xmppNet = document.getElementById('xmppNet');
+        xmppNet.innerHTML = network.toString();
+    }
+    else {
+        panel['error'].style.display = 'block';
+        panel['error'].innerHTML = 'No response received !';
+    }
+
+}
+
+function exploreServer(ev) {
+    browser.runtime.sendMessage({
+        'from': 'panel',
+        'subject': 'exploreServer',
+        'payload': document.getElementById('exploreServer').value
+    }, refreshNetwork);
+}
+
 connectButtons = document.getElementsByClassName('connectClient');
 
 for (let key = 0; key < connectButtons.length; key++) {
     connectButtons[key].onclick = sendConnect;
 }
+
+exploreForm = document.getElementById('explore');
+exploreForm.addEventListener('submit', (event) => {
+    exploreServer(event);
+    event.preventDefault();
+}, false);
 
 let panelListener = function (message, sender, sendRepsone) {
     let asynchroneResponse = false;
