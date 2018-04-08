@@ -341,6 +341,7 @@ class Client {
                 console.log('stream authenticate failed with error: ' + failure);
                 this.bindError = 'stream authenticate failed with error: ' + failure;
                 this.close();
+                delete this.password;
             }
             break;
 
@@ -351,6 +352,7 @@ class Client {
                 // Save SASL State
                 this.saslStep = 0;
                 this.saslDone = true;
+                delete this.password;
 
                 // Initiate Stream restart (just send new <open/> as implicitly closed)
                 this.stream.initiate()
