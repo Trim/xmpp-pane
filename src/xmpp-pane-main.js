@@ -153,7 +153,7 @@ xmppClientListener = function (message, sender, sendResponse) {
                 },
                 (error) => {
                     sendResponse({
-                        'step': 'discovered',
+                        'step': 'failed',
                         'error': error
                     });
                 });

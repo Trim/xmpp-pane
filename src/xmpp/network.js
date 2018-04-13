@@ -70,7 +70,7 @@ class Network {
                 let service = this.pubsub.get(_netElement.jid);
             }
 
-            if (service){
+            if (service) {
                 for (let feature of _netElement.featureSet) {
                     // TODO: decide which features to track and how to use them
                     service.get("metaData").get("features").add(feature);
