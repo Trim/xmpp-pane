@@ -70,14 +70,14 @@ function checkConnection() {
     }, clientConnected);
 }
 
-function refreshNetwork(network) {
-    if (network) {
+function refreshNetwork(response) {
+    if (!response.error) {
         let xmppNet = document.getElementById('xmppNet');
-        xmppNet.innerHTML = network.toString();
+        xmppNet.innerHTML = response.toString();
     }
     else {
         panel['error'].style.display = 'block';
-        panel['error'].innerHTML = 'No response received !';
+        panel['error'].innerHTML = response.error.message + '(' + response.error.code + ')';
     }
 
 }
