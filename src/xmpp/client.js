@@ -268,22 +268,39 @@ class Client {
         if (Object.keys(this.contracts).find((contractId) => {
                 return contractId == _message.id
             })) {
+            // TODO: Check that XMPP always send <error> (if not move this code approprieterly)
+            let errorEntities = _message.getElementsByTagName('error');
+
+            if (errorEntities.length > 0) {
+                let errorCode = errorEntities[0].getAttribute('code');
+                let errorMessage = _message.getElementsByTagName('text')[0].innerHTML;
+
+                this.contracts[_message.id].fail({
+                    message: errorMessage,
+                    code: errorCode
+                });
+
+                console.error('xmppClient: contract ' + _message.id + ' has failed (error: ' + errorCode + ', ' + errorMessage + ')');
+                return;
+            }
+
             // TODO: Add checks about namespaceURI too
             if (this.contracts[_message.id].nodeName == _message.nodeName) {
                 this.contracts[_message.id].success(_message);
             }
             else {
                 this.contracts[_message.id].fail({
-                    error: 'node name did not match: expected ['
+                    message: 'node name did not match: expected ['
                         + this.contracts[_message.id].nodeName + ']'
                         + ', received ['
                         + _message.children[0].nodeName
-                        + ']'
+                        + ']',
+                    code: 'badNodeName'
                 });
             }
         }
         else {
-            console.err('xmppClient: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
+            console.error('xmppClient: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
         }
     }
 
@@ -450,7 +467,8 @@ class Client {
                                 this.xmppNet.registerService(entity);
                             },
                             (error) => {
-                                reject('client: discoPubsubService: unknown error: ' + error);
+                                console.log('client: discoPubsubService received error: ' + error.message);
+                                reject(error);
                             })
                         .then(
                             (result) => {
