@@ -34,12 +34,12 @@ class Entity {
         let type = _identity.getAttribute('type');
         let category = _identity.getAttribute('category');
         let name = _identity.getAttribute('name');
-        let node = _identity.getAttribute('node');
+        let xmllang = _identity.getAttribute('xml:lang');
 
         let idKey = {
             'type': type,
             'category': category,
-            'node': node
+            'xmllang': xmllang
         };
         let identity = this.identities.get(idKey)
 

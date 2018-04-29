@@ -29,12 +29,14 @@ class Network {
         if (_netElement instanceof Entity) {
             // Look for identities
             for (let [idKey, idValue] of _netElement.identityMap) {
+                // TODO: Better decide which identity we want to store
                 if (idKey.xmllang == 'en'
+                    || !idKey.xmllang
                     || idKey.xmllang == this.xmllang) {
 
                     // If pubsub service is discoverd save it on the pubsub/services path
-                    if (idKey.type == "pubsub"
-                        && idKey.category == "service") {
+                    if (idKey.type == "service"
+                        && idKey.category == "pubsub") {
                         let service = new Map();
                         service.set("metaData", new Map());
                         service.get("metaData").set("name", idValue);
@@ -67,7 +69,7 @@ class Network {
             // Look for features
             let service = null;
             if (this.pubsub.has(_netElement.jid)) {
-                let service = this.pubsub.get(_netElement.jid);
+                service = this.pubsub.get(_netElement.jid);
             }
 
             if (service) {

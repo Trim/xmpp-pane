@@ -455,7 +455,7 @@ class Client {
                                 let features = iqResponse.getElementsByTagName('feature');
 
                                 for (let i = 0; i < identities.length; i++) {
-                                    entity.addFeature(identities[i]);
+                                    entity.addIdentity(identities[i]);
                                 }
 
                                 for (let i = 0; i < features.length; i++) {
