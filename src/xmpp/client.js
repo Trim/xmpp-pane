@@ -139,7 +139,7 @@ class Client {
                 xmppClient.socket = new WebSocket(_websocketURL, 'xmpp');
 
                 xmppClient.socket.onopen = function (event) {
-                    console.log('xmppClient.socket connected: ' + event);
+                    console.log('client socket connected: ' + event);
                     // TODO: Check if server response contains HTTP Header Sec-WebSocket-Protocol == xmpp.
                     // Otherwise, close it (not sure if it's doable easily).
                     if (false) {
@@ -222,7 +222,7 @@ class Client {
      * Receiving message from the websocket and handle contracts linked to the message.
      */
     onmessage(_response) {
-        console.log('xmppClient: raw message received: ' + _response.data);
+        console.log('client: raw message received: ' + _response.data);
 
         // TODO: On parsing error, close the stream
         let message = this.domParser.parseFromString(_response.data, "text/xml").documentElement;
@@ -244,17 +244,17 @@ class Client {
             break;
 
         default:
-            console.log('xmppClient: unknown namespaceURI element: ' + message.namespaceURI);
-            console.log('xmppClient: looking for known nodeName: ' + message.nodeName)
+            console.log('client: unknown namespaceURI element: ' + message.namespaceURI);
+            console.log('client: looking for known nodeName: ' + message.nodeName)
             switch (message.nodeName) {
             case 'iq':
-                console.log('xmppClient: IQ stanza received, looking in contracts for id: ' + message.id);
-                console.log('xmppClient: The IQ unique child is named: ' + message.children[0].nodeName);
+                console.log('client: IQ stanza received, looking in contracts for id: ' + message.id);
+                console.log('client: The IQ unique child is named: ' + message.children[0].nodeName);
                 this.handleContract(message);
                 break;
 
             default:
-                console.log('xmppClient: unknown namespace and nodename, nothing todo.');
+                console.log('client: unknown namespace and nodename, nothing todo.');
                 break;
             }
             break;
@@ -280,7 +280,7 @@ class Client {
                     code: errorCode
                 });
 
-                console.error('xmppClient: contract ' + _message.id + ' has failed (error: ' + errorCode + ', ' + errorMessage + ')');
+                console.error('client: contract ' + _message.id + ' has failed (error: ' + errorCode + ', ' + errorMessage + ')');
                 return;
             }
 
@@ -300,7 +300,7 @@ class Client {
             }
         }
         else {
-            console.error('xmppClient: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
+            console.error('client: client ' + this.fulljid + ' did not expect contract id: ' + _message.id);
         }
     }
 
