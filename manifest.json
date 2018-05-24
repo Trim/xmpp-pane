@@ -13,6 +13,8 @@
     "permissions": ["storage"],
 
     "options_ui": {
+        "browser_style": true,
+        "open_in_tab": false,
         "page": "src/options/options.html"
     },
 
@@ -36,6 +38,7 @@
     },
 
     "sidebar_action": {
+        "browser_style": true,
         "default_title": "__MSG_sidebarTitle__",
         "default_panel": "src/sidebar/panel.html",
         "default_icon": "data/sidebar/icons/32x32/default.png"
