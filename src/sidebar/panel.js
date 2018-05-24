@@ -7,20 +7,20 @@ panel = {
 }
 
 for (let pane in panel) {
-    panel[pane].style.display = 'none';
+    pane.className = 'panel disabled';
 }
 
 function displayFirstRun(response) {
     if (response.configured == true) {
-        panel['firstrun'].style.display = 'none';
+        panel['firstrun'].className = 'panel disabled';
         chrome.runtime.sendMessage({
             'from': 'panel',
             'subject': 'isConnected'
         }, displayConnect);
     }
     else {
-        panel['firstrun'].style.display = 'block';
-        panel['connect'].style.display = 'none';
+        panel['firstrun'].className = 'panel enabled';
+        panel['connect'].className = 'panel disabled';
     }
 }
 
@@ -31,27 +31,27 @@ function displayConnect(response) {
         });
     }
     else {
-        panel['connect'].style.display = 'block';
+        panel['connect'].className = 'panel enabled';
     }
 }
 
 function clientConnected(response) {
-    panel['info'].style.display = 'none';
-    panel['firstrun'].style.display = 'none';
-    panel['connect'].style.display = 'none';
+    panel['info'].className = 'panel disabled'
+    panel['firstrun'].className = 'panel disabled'
+    panel['connect'].className = 'panel disabled'
 
     if (response.step == 'initialized') {
-        panel['info'].style.display = 'block';
+        panel['info'].className = 'panel enabled';
         panel['info'].innerHTML = 'Client initiated connection with server. Waiting for authentication…'
         checkConnection();
     }
     else if (response.connected == true) {
-        panel['error'].style.display = 'none';
-        panel['info'].style.display = 'none';
-        panel['pubsub'].style.display = 'block';
+        panel['error'].className = 'panel disabled'
+        panel['info'].className = 'panel disabled'
+        panel['pubsub'].className = 'panel enabled';
     }
     else if (response.connected == false) {
-        panel['error'].style.display = 'block';
+        panel['error'].className = 'panel enabled';
         panel['error'].innerHTML = response.error + '<br/>You could try to <a href="../options/options.html">modify</a> your settings';
     }
 }
@@ -76,7 +76,7 @@ function refreshNetwork(response) {
         xmppNet.innerHTML = response.toString();
     }
     else {
-        panel['error'].style.display = 'block';
+        panel['error'].className = 'panel enabled';
         panel['error'].innerHTML = response.error.message + '(' + response.error.code + ')';
     }
 

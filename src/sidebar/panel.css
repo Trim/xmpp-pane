@@ -1,3 +1,18 @@
-div.panel{
+body {
+    padding: 0.5rem 1rem;
+}
+
+div.panel.disabled{
     display: none;
+}
+
+div.panel.enabled{
+    display: block;
+}
+
+#firstrunpanel>object {
+    width: 100%;
+    height: 50vh;
+    padding:0;
+    margin:0;
 }

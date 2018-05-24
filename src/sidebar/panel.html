@@ -6,27 +6,27 @@
     </head>
 
     <body>
-        <div id="errorpanel" class="panel" style="padding:1rem;background-color:red;">
+        <div id="errorpanel" class="panel disabled" style="padding:1rem;background-color:red;">
         </div>
 
-        <div id="infopanel" class="panel" style="padding:1rem;background-color:orange;">
+        <div id="infopanel" class="panel disabled" style="padding:1rem;background-color:orange;">
         </div>
 
-        <div id="firstrunpanel" class="panel">
-            <p>Welcome to XMPP Pane!</p>
-            <p>First, you'll have to <a href="../options/options.html">configure</a> first your XMPP account.</p>
-            <p>Then, <button class="connectClient">connect</button> and enjoy!</p>
+        <div id="firstrunpanel" class="panel disabled">
+            <p>Welcome to XMPP Pane !</p>
+            <p>To begin, configure, your XMPP account:</p>
+            <object data="../options/options.html"></object>
         </div>
 
-        <div id="connectpanel" class="panel">
-            <p>You are disconnected, please <button class="connectClient">connect</button></p>
+        <div id="connectpanel" class="panel disabled">
+            <p>You are disconnected, please <button class="connectClient browser-style">connect</button></p>
         </div>
 
-        <div id="pubsubpanel" class="panel">
+        <div id="pubsubpanel" class="panel disabled">
             <h1>Communities</h1>
-            <form id='explore'>
-                <label for="exploreServer">Server:</label><input id="exploreServer" type="text"></input>
-                <button type="send">explore</button>
+            <form id='explore' class="browser-style">
+                <label class="browser-style-labelh" for="exploreServer">Server:</label><input id="exploreServer" type="text"></input>
+                <button type="send" class="browser-style">explore</button>
             </form>
 
             <div id="xmppNet"></div>
