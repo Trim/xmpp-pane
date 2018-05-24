@@ -3,21 +3,22 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <link rel="stylesheet" href="chrome://browser/content/extension.css" />
         <link rel="stylesheet" href="options.css" />
     </head>
 
     <body>
         <form>
-            <fieldset>
+            <fieldset class="browser-style">
                 <legend>Authentication</legend>
-                <label for="jid">XMPP identifier</label>
+                <label class="browser-style-label" for="jid">XMPP identifier</label>
                 <input id="jid" type="email" placeholder="account@im.example.org" />
-                <label for="password">Password</label>
+                <label class="browser-style-label" for="password">Password</label>
                 <input id="password" type="password" placeholder="Fill this field only to set or update password."/>
-                <label for="websocket">WebSocket URL <span class="explain" title="If discoverable from wellknown URL on the domain name." style="font-size:0.8rem">(optional)</span></label>
+                <label class="browser-style-label" for="websocket">WebSocket URL <span class="explain" title="If discoverable from wellknown URL on the domain name." style="font-size:0.8rem">(optional)</span></label>
                 <input id="websocket" type="text" placeholder="wss://example.com:5280/"></input>
             </fieldset>
-            <button type="submit">Save and start !</button>
+            <button type="submit" class="browser-style default">Save and start</button>
         </form>
 
         <script src="options.js"></script>
