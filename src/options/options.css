@@ -20,6 +20,7 @@ input
 .explain
 {
     border-bottom: 1px dashed gray;
+    font-size : 0.8rem;
 }
 
 .explain:hover

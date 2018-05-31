@@ -36,15 +36,42 @@ function saveOptions(e) {
     });
 }
 
+function renderForm() {
+    let optionForm = Mustache.render(template, optionStrings);
+    document.querySelector("#target").innerHTML = optionForm;
+
+    document.querySelector("form").addEventListener("submit", saveOptions);
+}
+
 function restoreOptions() {
 
     function setJidInput(result) {
-        document.querySelector("#jid").value = result.jid || "";
+        optionStrings['jid'] = result.jid;
     }
 
     let getJid = browser.storage.local.get("jid");
-    getJid.then(setJidInput);
+    getJid.then(setJidInput).then(renderForm);
 }
 
+// Render the page
+let optionStrings = {
+    'authenticate': '',
+    'xmpp-identifier-label': '',
+    'xmpp-identifier-placeholder': '',
+    'password-label': '',
+    'password-placeholder': '',
+    'websocket-label': '',
+    'websocket-placeholder': '',
+    'websocket-help': '',
+    'optional': '',
+    'save-start': ''
+}
+
+for (const string of Object.keys(optionStrings)) {
+    optionStrings[string] = browser.i18n.getMessage(string);
+}
+
+let template = document.querySelector("#form").innerHTML;
+
+// Add logic to the form
 document.addEventListener("DOMContentLoaded", restoreOptions);
-document.querySelector("form").addEventListener("submit", saveOptions);

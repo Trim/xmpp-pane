@@ -12,5 +12,55 @@
     "sidebarTitle": {
         "description": "Title shown in the sidebar panel.",
         "message": "XMPP Pane"
+    },
+
+    "authenticate": {
+        "description": "Label used to describe authentication part of options",
+        "message": "Authenticate"
+    },
+
+    "xmpp-identifier-label": {
+        "description": "Label used to ask a XMPP Identifier.",
+        "message": "XMPP Identifier"
+    },
+
+    "xmpp-identifier-placeholder":{
+        "description": "Placeholder used to show an example of XMPP Identifier",
+        "message": "john.smith@example.com"
+    },
+
+    "password-label": {
+        "description": "Label used to ask a password.",
+        "message": "Password"
+    },
+
+    "password-placeholder": {
+        "description": "Placeholder used to explain the password field should be filled only to set or update it.",
+        "message": "Fill password only to set or update it."
+    },
+
+    "websocket-label": {
+        "description": "Label used to ask the WebSocket URL.",
+        "message": "Websocket URL"
+    },
+
+    "websocket-placeholder": {
+        "description": "Placeholder showing an example of WebSocket URL.",
+        "message": "wss://example.com"
+    },
+
+    "websocket-help": {
+        "description": "Explain when the Websocket URL is optional",
+        "message": "Optional when it is discoverable from a well-known URL on the XMPP domain."
+    },
+
+    "optional": {
+        "description": "optional",
+        "message": "optional"
+    },
+
+    "save-start": {
+        "description": "Label for button Save and Start",
+        "message": "Save and start"
     }
 }

@@ -8,19 +8,61 @@
     </head>
 
     <body>
+        <div id="target"></div>
+
+        <script id="form" type="x-tmpl-mustache">
         <form>
             <fieldset class="browser-style">
-                <legend>Authentication</legend>
-                <label class="browser-style-label" for="jid">XMPP identifier</label>
-                <input id="jid" type="email" placeholder="account@im.example.org" />
-                <label class="browser-style-label" for="password">Password</label>
-                <input id="password" type="password" placeholder="Fill this field only to set or update password."/>
-                <label class="browser-style-label" for="websocket">WebSocket URL <span class="explain" title="If discoverable from wellknown URL on the domain name." style="font-size:0.8rem">(optional)</span></label>
-                <input id="websocket" type="text" placeholder="wss://example.com:5280/"></input>
-            </fieldset>
-            <button type="submit" class="browser-style default">Save and start</button>
-        </form>
+                <legend>{{authenticate}}</legend>
+                <label
+                    class="browser-style-label"
+                    for="jid">
+                    {{xmpp-identifier-label}}
+                </label>
 
+                <input id="jid"
+                    type="email"
+                    placeholder="{{xmpp-identifier-placeholder}}"
+                    value="{{jid}}" />
+
+                <label
+                    class="browser-style-label"
+                    for="password">
+                    {{password-label}}
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="{{password-placeholder}}"/>
+
+                <label
+                    class="browser-style-label"
+                    for="websocket">
+                    {{websocket-label}}
+                    <span
+                         class="explain"
+                         title="{{websocket-help}}" >
+                         ({{optional}})
+                     </span>
+                </label>
+
+                <input
+                    id="websocket"
+                    type="text"
+                    placeholder="{{websocket-placeholder}}">
+                </input>
+
+            </fieldset>
+            <button
+                type="submit"
+                class="browser-style default">
+                {{save-start}}
+            </button>
+        </form>
+        </script>
+
+        <script src="../3rdparty/mustache.js/mustache.js"></script>
         <script src="options.js"></script>
     </body>
 </html>
