@@ -1,0 +1,3 @@
+[submodule "src/3rdparty/mustache.js"]
+	path = src/3rdparty/mustache.js
+	url = https://github.com/janl/mustache.js/
