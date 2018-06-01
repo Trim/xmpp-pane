@@ -24,7 +24,7 @@
         "message": "XMPP Identifier"
     },
 
-    "xmpp-identifier-placeholder":{
+    "xmpp-identifier-placeholder": {
         "description": "Placeholder used to show an example of XMPP Identifier",
         "message": "john.smith@example.com"
     },
