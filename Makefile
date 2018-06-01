@@ -17,8 +17,7 @@
 
 .PHONY: build-dev build-zip beautifyjs
 
-
-buid-zip:
+build-zip:
 	# Sync all files except 3rdparty and git directory
 	zip ../xmpp-pane.zip -FS -R '*' \
 		-x 'src/3rdparty/*' '.git/*'
