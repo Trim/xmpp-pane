@@ -62,5 +62,45 @@
     "save-start": {
         "description": "Label for button Save and Start",
         "message": "Save and start"
+    },
+
+    "first-run-welcome": {
+        "description": "Welcome title when client not configured",
+        "message": "Welcome to XMPP Pane !"
+    },
+
+    "first-run-configure": {
+        "description": "First paragraph asking to configure the XMPP account",
+        "message": "To begin, configure your XMPP account:"
+    },
+
+    "disconnected-text": {
+        "description": "Small text announcing the disconnected state to the user",
+        "message": "You are disconnected."
+    },
+
+    "connect-back-button": {
+        "description": "Label for button to connect back to the network",
+        "message": "Connect me back!"
+    },
+
+    "pubsub-title": {
+        "description": "Title of the panel showing pub/sub communities.",
+        "message": "Communities"
+    },
+
+    "pubsub-explore-server": {
+        "description": "Label to ask which pubsub server to explore",
+        "message": "Server"
+    },
+
+    "pubsub-explore-placeholder": {
+        "description": "Example of valid input for server to explore",
+        "message": "pubsub.example.com"
+    },
+
+    "pubsub-explore-button": {
+        "description": "Button label to launch the explortaion of pubsub server.",
+        "message": "Explore"
     }
 }

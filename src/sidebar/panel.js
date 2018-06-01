@@ -1,13 +1,8 @@
-panel = {
-    error: document.getElementById('errorpanel'),
-    info: document.getElementById('infopanel'),
-    connect: document.getElementById('connectpanel'),
-    firstrun: document.getElementById('firstrunpanel'),
-    pubsub: document.getElementById('pubsubpanel')
-}
+function panelRender(selector) {
+    let template = document.querySelector('#' + selector + '-tmpl').innerHTML;
+    Mustache.parse(template)
 
-for (let pane in panel) {
-    pane.className = 'panel disabled';
+    document.querySelector("#" + selector).innerHTML = Mustache.render(template, panelStrings);
 }
 
 function displayFirstRun(response) {
@@ -90,6 +85,41 @@ function exploreServer(ev) {
     }, refreshNetwork);
 }
 
+// Render the page
+
+let panelStrings = {
+    'first-run-welcome': '',
+    'first-run-configure': '',
+    'disconnected-text': '',
+    'connect-back-button': '',
+    'pubsub-title': '',
+    'pubsub-explore-server': '',
+    'pubsub-explore-placeholder': '',
+    'pubsub-explore-button': '',
+}
+
+for (const string of Object.keys(panelStrings)) {
+    panelStrings[string] = browser.i18n.getMessage(string);
+}
+
+panelRender('firstrunpanel');
+panelRender('connectpanel');
+panelRender('pubsubpanel');
+
+// Read page and apply events
+
+panel = {
+    error: document.getElementById('errorpanel'),
+    info: document.getElementById('infopanel'),
+    connect: document.getElementById('connectpanel'),
+    firstrun: document.getElementById('firstrunpanel'),
+    pubsub: document.getElementById('pubsubpanel')
+}
+
+for (let pane in panel) {
+    pane.className = 'panel disabled';
+}
+
 connectButtons = document.getElementsByClassName('connectClient');
 
 for (let key = 0; key < connectButtons.length; key++) {
@@ -118,6 +148,8 @@ let panelListener = function (message, sender, sendRepsone) {
 
     return asynchroneResponse;
 }
+
+// External message listener
 
 browser.runtime.onMessage.addListener(panelListener)
 

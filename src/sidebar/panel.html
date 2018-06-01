@@ -6,33 +6,63 @@
     </head>
 
     <body>
-        <div id="errorpanel" class="panel disabled" style="padding:1rem;background-color:red;">
-        </div>
+        <div id="errorpanel" class="panel disabled" style="padding:1rem;background-color:red;"></div>
 
-        <div id="infopanel" class="panel disabled" style="padding:1rem;background-color:orange;">
-        </div>
+        <div id="infopanel" class="panel disabled" style="padding:1rem;background-color:orange;"></div>
 
-        <div id="firstrunpanel" class="panel disabled">
-            <p>Welcome to XMPP Pane !</p>
-            <p>To begin, configure, your XMPP account:</p>
-            <object data="../options/options.html"></object>
-        </div>
+        <div id="firstrunpanel" class="panel disabled"></div>
 
-        <div id="connectpanel" class="panel disabled">
-            <p>You are disconnected, please <button class="connectClient browser-style">connect</button></p>
-        </div>
+        <div id="connectpanel" class="panel disabled"></div>
 
-        <div id="pubsubpanel" class="panel disabled">
-            <h1>Communities</h1>
-            <form id='explore' class="browser-style">
-                <label class="browser-style-labelh" for="exploreServer">Server:</label><input id="exploreServer" type="text"></input>
-                <button type="send" class="browser-style">explore</button>
+        <div id="pubsubpanel" class="panel disabled"></div>
+
+        <script id="firstrunpanel-tmpl" type="x-tmpl-mustache">
+            <h1>{{first-run-welcome}}</h1>
+            <p>{{first-run-configure}}</p>
+            <object
+                data="../options/options.html">
+            </object>
+        </script>
+
+        <script id="connectpanel-tmpl" type="x-tmpl-mustache">
+            <p>{{disconnected-text}}</p>
+            <p>
+                <button
+                    class="connectClient browser-style">
+                    {{connect-back-button}}
+                </button>
+            </p>
+        </script>
+
+        <script id="pubsubpanel-tmpl" type="x-tmpl-mustache">
+            <h1>{{pubsub-title}}</h1>
+            <form
+                id='explore'
+                class="browser-style">
+
+                <label
+                    class="browser-style-label"
+                    for="exploreServer">
+                    {{pubsub-explore-server}}
+                </label>
+
+                <input
+                    id="exploreServer"
+                    type="text"
+                    placeholder="{{pubsub-explore-placeholder}}">
+                </input>
+
+                <button
+                    type="send"
+                    class="browser-style">
+                    {{pubsub-explore-button}}
+                </button>
             </form>
 
             <div id="xmppNet"></div>
+        </script>
 
-        </div>
-
+        <script src="../3rdparty/mustache.js/mustache.js"></script>
         <script src="panel.js"></script>
     </body>
 </html>
