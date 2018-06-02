@@ -10,9 +10,35 @@ div.panel.enabled{
     display: block;
 }
 
-#firstrunpanel>object {
+#firstrunpanel > object {
     width: 100%;
-    height: 50vh;
+    height: 72vh;
     padding:0;
     margin:0;
 }
+
+#infopanel {
+    width: 100%;
+    padding: 0.5rem;
+    margin:0.5rem auto;
+    vertical-align: middle;
+    border: 1px #0670cc solid;
+    border-radius: 0.5rem;
+}
+
+#errorpanel {
+    width: 100%;
+    padding: 0.5rem;
+    margin:0.5rem auto;
+    vertical-align: middle;
+    border: 1px red solid;
+    border-radius: 0.5rem;
+}
+
+@media (min-width: 450px)
+{
+    #firstrunpanel > object {
+        height: 50vh;
+    }
+}
+
