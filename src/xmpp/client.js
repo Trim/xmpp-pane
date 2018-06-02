@@ -24,6 +24,9 @@ class Client {
         this.password = _config.password;
         delete this.config.password;
 
+        // optional websocketURL
+        this.websocketURL = _config.websocketURL;
+
         // DOM toolbox
         this.dom = document.implementation.createDocument(null, null);
         this.domParser = new DOMParser();
@@ -177,21 +180,26 @@ class Client {
 
             let xmppClient = this;
 
-            // First look on secure connection for websocket URL
-            let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
-            fetch(xrdURL)
-                .then(function (xrdResponse) {
-                    return xrdResponse.text();
-                })
-                .then(xrdFindWebsocketURL, function (error) {
-                    let xrdURL = 'http://' + xmppClient.config.domainpart + '/.well-known/host-meta';
+            if (this.websocketURL) {
+                handshake(this.websocketURL)
+            }
+            else {
+                // First look on secure connection for websocket URL
+                let xrdURL = 'https://' + this.config.domainpart + '/.well-known/host-meta';
+                fetch(xrdURL)
+                    .then(function (xrdResponse) {
+                        return xrdResponse.text();
+                    })
+                    .then(xrdFindWebsocketURL, function (error) {
+                        let xrdURL = 'http://' + xmppClient.config.domainpart + '/.well-known/host-meta';
 
-                    return fetch(xrdUrl)
-                        .then(function (xrdResponse) {
-                            return xrdResponse.text();
-                        });
-                })
-                .then(handshake);
+                        return fetch(xrdUrl)
+                            .then(function (xrdResponse) {
+                                return xrdResponse.text();
+                            });
+                    })
+                    .then(handshake);
+            }
         });
     }
 

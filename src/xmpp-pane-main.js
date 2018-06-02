@@ -1,53 +1,43 @@
 console.log('Welcome to XMPP-Pane main background script.');
 
-retrieveConfig = function () {
+retrieveConfig = function (jid, password, websocketURL) {
     return new Promise((resolve, reject) => {
         let config = {};
 
-        function setJid(localStorage) {
+        if (jid) {
+            config.jid = jid;
+            config.fulljid = null;
+            let splitedJid = config.jid.split('@');
+            config.localpart = splitedJid[0];
+            config.domainpart = splitedJid[1];
 
-            if (localStorage.jid) {
-                config.jid = localStorage.jid;
-                config.fulljid = null;
-                let splitedJid = config.jid.split('@');
-                config.localpart = splitedJid[0];
-                config.domainpart = splitedJid[1];
-
-                console.log('xmpp-pane-main: jid: ' + config.jid);
-                console.log('xmpp-pane-main: local part: ' + config.localpart);
-                console.log('xmpp-pane-main: domain part: ' + config.domainpart);
-            }
+            console.log('xmpp-pane-main: jid: ' + config.jid);
+            console.log('xmpp-pane-main: local part: ' + config.localpart);
+            console.log('xmpp-pane-main: domain part: ' + config.domainpart);
         }
 
-        function setPassword(localStorage) {
-            if (localStorage.password) {
-                config.password = localStorage.password;
-                console.log('xmpp-pane-main: local storage found password.');
-            }
+        if (password) {
+            config.password = password;
+            console.log('xmpp-pane-main: found password.');
         }
 
-        function onError(error) {
-            console.log('xmpp-pane-main: error:' + error);
-            reject(error);
+        if (websocketURL) {
+            config.websocketURL = websocketURL;
+        }
+        else {
+            config.websocketURL = null;
         }
 
-        let getJid = browser.storage.local.get("jid");
-        let getPassword = browser.storage.local.get("password");
-
-        getJid.then(setJid, onError)
-            .then(getPassword.then(setPassword, onError)
-                .then(() => {
-                    if (config.jid
-                        && config.localpart
-                        && config.domainpart
-                        && config.password) {
-                        config.xmllang = browser.i18n.getUILanguage();
-                        resolve(config);
-                    }
-                    else {
-                        reject("xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first.");
-                    }
-                }));
+        if (config.jid
+            && config.localpart
+            && config.domainpart
+            && config.password) {
+            config.xmllang = browser.i18n.getUILanguage();
+            resolve(config);
+        }
+        else {
+            reject("xmpp-pane-main: Some configuration hasn't been found, please configure xmpp-pane first.");
+        }
     });
 };
 
@@ -58,20 +48,16 @@ xmppClientListener = function (message, sender, sendResponse) {
 
     switch (message.subject) {
     case 'isConfigured':
-        asynchroneResponse = true;
-        retrieveConfig()
-            .then(
-                (config) => {
-                    sendResponse({
-                        configured: true
-                    });
-                },
-                (error) => {
-                    sendResponse({
-                        configured: false
-                    });
-                }
-            );
+        if (xmppPaneClient) {
+            sendResponse({
+                configured: true
+            });
+        }
+        else {
+            sendResponse({
+                configured: false
+            });
+        }
         break;
 
     case 'isConnected':
@@ -105,7 +91,7 @@ xmppClientListener = function (message, sender, sendResponse) {
 
     case 'connect':
         asynchroneResponse = true;
-        retrieveConfig()
+        retrieveConfig(message.jid, message.password, message.websocketURL)
             .then(
                 (_config) => {
                     xmppPaneClient = new Client(_config);
