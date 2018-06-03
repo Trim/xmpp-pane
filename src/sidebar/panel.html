@@ -62,6 +62,20 @@
             <div id="xmppNet"></div>
         </script>
 
+        <script id="xmppNet-tmpl" type="x-tmpl-mustache">
+            {{#pubsub}}
+                <h2>{{name}} ({{jid}})</h2>
+                <div class='features'>
+                    <div>ⓘ</div>
+                    <ul>
+                        {{#features}}
+                            <li>{{feature}}</li>
+                        {{/features}}
+                    </ul>
+                </div>
+            {{/pubsub}}
+        </script>
+
         <script src="../3rdparty/mustache.js/mustache.js"></script>
         <script src="panel.js"></script>
     </body>

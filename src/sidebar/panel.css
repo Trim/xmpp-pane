@@ -10,6 +10,21 @@ div.panel.enabled{
     display: block;
 }
 
+.features {
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+}
+
+.features > div
+{
+    grid-column: 1;
+}
+
+.features > ul
+{
+    grid-column: 1;
+}
+
 #firstrunpanel > object {
     width: 100%;
     height: 72vh;

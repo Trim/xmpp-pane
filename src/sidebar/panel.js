@@ -68,20 +68,23 @@ function checkConnection() {
 function refreshNetwork(response) {
     if (!response.error) {
         let xmppNet = document.getElementById('xmppNet');
-        let pubsubNet = {'pubsub': []}
+        let pubsubNet = {'pubsub': new Array()}
 
-        let pubsubIterator = response.network.pubsub.keys();
-        let isIteratorDone = false
-        while (!isIteratorDone) {
-            let pubsub = pubsubIterator.next();
-            isIteratorDone = pubsub.done;
+        response.network.pubsub.forEach( (entity, jid) => {
+            let features = new Array();
 
-            if (!isIteratorDone) {
-                pubsubNet['pubsub'].push({'name': pubsub.value});
-            }
-        }
+            entity['metadata']['features'].forEach( (feature) => {
+                features.push({'feature': feature});
+            });
 
-        xmppNet.innerHTML = Mustache.render('{{#pubsub}}{{name}}<br>{{/pubsub}}', pubsubNet);
+            pubsubNet['pubsub'].push({'name': entity['metadata']['name'] || jid,
+                'jid': jid,
+                'features': features
+            });
+
+        });
+
+        xmppNet.innerHTML = Mustache.render(document.querySelector('#xmppNet-tmpl').innerHTML, pubsubNet);
     }
     else {
         panel['error'].className = 'panel enabled';

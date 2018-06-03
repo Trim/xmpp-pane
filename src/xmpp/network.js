@@ -16,8 +16,8 @@ class Network {
         this.entities = new Map();
 
         // key: serviceid (jid?)
-        // object: array(metaData, nodeMap, collectionMap, leafMap)
-        // metaData:  name (string), features (set)
+        // object: array(metadata, nodeMap, collectionMap, leafMap)
+        // metadata:  array(name (string), features (set))
         this.pubsub = new Map();
 
         // key: serviceid
@@ -37,12 +37,13 @@ class Network {
                     // If pubsub service is discoverd save it on the pubsub/services path
                     if (idKey.type == "service"
                         && idKey.category == "pubsub") {
-                        let service = new Map();
-                        service.set("metaData", new Map());
-                        service.get("metaData").set("name", idValue);
-                        service.get("metaData").set("features", new Set());
-                        service.set("collections", new Map());
-                        service.set("leaves", new Map());
+                        let service = new Array();
+                        service["metadata"] = new Array();
+                        service["metadata"]["name"] = idValue;
+                        service["metadata"]["features"] = new Set();
+                        service["nodes"] = new Map();
+                        service["collections"] = new Map();
+                        service["leaves"] = new Map();
                         this.pubsub.set(_netElement.jid, service);
                     }
                 }
@@ -56,12 +57,12 @@ class Network {
                 for (let [idKey, idValue] of _netElement.identities) {
                     if (idKey.type == "pubsub"
                         && idKey.category == "collection") {
-                        service.get("collections").set(idKey.node, new Map());
+                        service["collections"].set(idKey.node, new Map());
                     }
 
                     if (idKey.type == "pubsub"
                         && idKey.category == "leaf") {
-                        service.get("leaves").set(idKey.node, new Map());
+                        service["leaves"].set(idKey.node, new Map());
                     }
                 }
             }
@@ -75,7 +76,7 @@ class Network {
             if (service) {
                 for (let feature of _netElement.featureSet) {
                     // TODO: decide which features to track and how to use them
-                    service.get("metaData").get("features").add(feature);
+                    service["metadata"]["features"].add(feature);
                 }
             }
         }
