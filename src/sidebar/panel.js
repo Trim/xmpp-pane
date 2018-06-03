@@ -68,7 +68,20 @@ function checkConnection() {
 function refreshNetwork(response) {
     if (!response.error) {
         let xmppNet = document.getElementById('xmppNet');
-        xmppNet.innerHTML = response.toString();
+        let pubsubNet = {'pubsub': []}
+
+        let pubsubIterator = response.network.pubsub.keys();
+        let isIteratorDone = false
+        while (!isIteratorDone) {
+            let pubsub = pubsubIterator.next();
+            isIteratorDone = pubsub.done;
+
+            if (!isIteratorDone) {
+                pubsubNet['pubsub'].push({'name': pubsub.value});
+            }
+        }
+
+        xmppNet.innerHTML = Mustache.render('{{#pubsub}}{{name}}<br>{{/pubsub}}', pubsubNet);
     }
     else {
         panel['error'].className = 'panel enabled';

@@ -81,7 +81,8 @@ class Network {
         }
 
         browser.runtime.sendMessage({
-            'subject': 'refreshNetwork'
+            'subject': 'refreshNetwork',
+            'network': this
         });
     }
 
