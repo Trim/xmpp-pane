@@ -84,6 +84,11 @@
         "message": "You are disconnected."
     },
 
+    "disconnect-label": {
+        "description": "Button label to disconnect current session",
+        "message": "Leave out !"
+    },
+
     "connect-back-button": {
         "description": "Label for button to connect back to the network",
         "message": "Connect me back!"

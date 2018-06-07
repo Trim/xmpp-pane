@@ -34,6 +34,7 @@ function clientConnected(response) {
     panel['info'].className = 'panel disabled'
     panel['firstrun'].className = 'panel disabled'
     panel['connect'].className = 'panel disabled'
+    panel['pubsub'].className = 'panel disabled';
 
     if (response.step == 'initialized') {
         panel['info'].className = 'panel enabled';
@@ -46,8 +47,15 @@ function clientConnected(response) {
         panel['pubsub'].className = 'panel enabled';
     }
     else if (response.connected == false) {
-        panel['error'].className = 'panel enabled';
-        panel['error'].innerHTML = response.error + '<br/>You could try to <a href="../options/options.html">modify</a> your settings';
+        if (response.error) {
+            panel['error'].className = 'panel enabled';
+            panel['error'].innerHTML = Mustache.render('<header><h1>Error</h1><article><header>{{error}}<br/>You could try to <a href="../options/options.html">modify</a> your settings.</article>', response);
+        }
+        else {
+            // TODO: Should show the 'connect' panel
+            // while we have no mean to store secret, show firstrun panel
+            panel['firstrun'].className = 'panel enabled'
+        }
     }
 }
 
@@ -55,6 +63,13 @@ function sendConnect(ev) {
     browser.runtime.sendMessage({
         'from': 'panel',
         'subject': 'connect'
+    }, clientConnected);
+}
+
+function sendDisconnect(ev) {
+    browser.runtime.sendMessage({
+        'from': 'panel',
+        'subject': 'disconnect'
     }, clientConnected);
 }
 
@@ -112,6 +127,7 @@ let panelStrings = {
     'first-run-welcome': '',
     'first-run-configure': '',
     'disconnected-text': '',
+    'disconnect-label': '',
     'connect-back-button': '',
     'pubsub-title': '',
     'pubsub-explore-server': '',
@@ -145,6 +161,12 @@ connectButtons = document.getElementsByClassName('connectClient');
 
 for (let key = 0; key < connectButtons.length; key++) {
     connectButtons[key].onclick = sendConnect;
+}
+
+disconnectButtons = document.getElementsByClassName('disconnectClient');
+
+for (let key = 0; key < disconnectButtons.length; key++) {
+    disconnectButtons[key].onclick = sendDisconnect;
 }
 
 exploreForm = document.getElementById('explore');
