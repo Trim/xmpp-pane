@@ -17,49 +17,79 @@
         <div id="pubsubpanel" class="panel disabled"></div>
 
         <script id="firstrunpanel-tmpl" type="x-tmpl-mustache">
-            <h1>{{first-run-welcome}}</h1>
-            <p>{{first-run-configure}}</p>
-            <object
-                data="../options/options.html">
-            </object>
+            <header>
+                <h1>{{first-run-welcome}}</h1>
+            </header>
+
+            <article>
+                <p>{{first-run-configure}}</p>
+                <object
+                    data="../options/options.html">
+                </object>
+            </article>
+
+            <footer>
+            </footer>
         </script>
 
         <script id="connectpanel-tmpl" type="x-tmpl-mustache">
-            <p>{{disconnected-text}}</p>
-            <p>
-                <button
-                    class="connectClient browser-style">
-                    {{connect-back-button}}
-                </button>
-            </p>
+            <header>
+            </header>
+
+            <article>
+                <p>{{disconnected-text}}</p>
+                <p>
+                    <button
+                        class="connectClient browser-style">
+                        {{connect-back-button}}
+                    </button>
+                </p>
+            </article>
+
+            <footer>
+            </footer>
         </script>
 
         <script id="pubsubpanel-tmpl" type="x-tmpl-mustache">
-            <h1>{{pubsub-title}}</h1>
-            <form
-                id='explore'
-                class="browser-style">
+            <header>
+                <h1>{{pubsub-title}}</h1>
+            </header>
 
-                <label
-                    class="browser-style-label"
-                    for="exploreServer">
-                    {{pubsub-explore-server}}
-                </label>
+            <article>
+                <p>
+                    <form
+                        id='explore'
+                        class="browser-style">
 
-                <input
-                    id="exploreServer"
-                    type="text"
-                    placeholder="{{pubsub-explore-placeholder}}">
-                </input>
+                        <label
+                            class="browser-style-label"
+                            for="exploreServer">
+                            {{pubsub-explore-server}}
+                        </label>
 
+                        <input
+                            id="exploreServer"
+                            type="text"
+                            placeholder="{{pubsub-explore-placeholder}}">
+                        </input>
+
+                        <button
+                            type="send"
+                            class="browser-style">
+                            {{pubsub-explore-button}}
+                        </button>
+                    </form>
+                </p>
+
+                <div id="xmppNet"></div>
+            </article>
+
+            <footer>
                 <button
-                    type="send"
-                    class="browser-style">
-                    {{pubsub-explore-button}}
+                    class="disconnectClient browser-style" >
+                    {{disconnect-label}}
                 </button>
-            </form>
-
-            <div id="xmppNet"></div>
+            </footer>
         </script>
 
         <script id="xmppNet-tmpl" type="x-tmpl-mustache">

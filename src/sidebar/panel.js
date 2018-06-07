@@ -31,14 +31,14 @@ function displayConnect(response) {
 }
 
 function clientConnected(response) {
-    panel['info'].className = 'panel disabled'
-    panel['firstrun'].className = 'panel disabled'
-    panel['connect'].className = 'panel disabled'
+    panel['info'].className = 'panel disabled';
+    panel['firstrun'].className = 'panel disabled';
+    panel['connect'].className = 'panel disabled';
     panel['pubsub'].className = 'panel disabled';
 
     if (response.step == 'initialized') {
         panel['info'].className = 'panel enabled';
-        panel['info'].innerHTML = 'Client initiated connection with server. Waiting for authentication…'
+        panel['info'].innerHTML = Mustache.render('<header><h1>Information</h1><article>Client initiated connection with server. Waiting for authentication…</article>', {});
         checkConnection();
     }
     else if (response.connected == true) {
