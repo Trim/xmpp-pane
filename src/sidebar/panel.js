@@ -68,16 +68,21 @@ function checkConnection() {
 function refreshNetwork(response) {
     if (!response.error) {
         let xmppNet = document.getElementById('xmppNet');
-        let pubsubNet = {'pubsub': new Array()}
+        let pubsubNet = {
+            'pubsub': new Array()
+        }
 
-        response.network.pubsub.forEach( (entity, jid) => {
+        response.network.pubsub.forEach((entity, jid) => {
             let features = new Array();
 
-            entity['metadata']['features'].forEach( (feature) => {
-                features.push({'feature': feature});
+            entity['metadata']['features'].forEach((feature) => {
+                features.push({
+                    'feature': feature
+                });
             });
 
-            pubsubNet['pubsub'].push({'name': entity['metadata']['name'] || jid,
+            pubsubNet['pubsub'].push({
+                'name': entity['metadata']['name'] || jid,
                 'jid': jid,
                 'features': features
             });

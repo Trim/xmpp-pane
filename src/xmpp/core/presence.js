@@ -16,7 +16,7 @@ class Presence extends Stanza {
             // However client MAY set "to" to route the presence to a recipient
             if (this.to) {
                 presence.setAttribute('to', this.to);
-	    }
+            }
 
             presence.setAttribute('from', this.from);
 

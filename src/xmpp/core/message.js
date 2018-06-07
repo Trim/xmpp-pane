@@ -16,7 +16,7 @@ class Message extends Stanza {
             // but it could be not defined to send message. to bare JID of the client
             if (this.to) {
                 message.setAttribute('to', this.to);
-	    }
+            }
 
             message.setAttribute('from', this.from);
 
