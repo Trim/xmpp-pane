@@ -24,6 +24,12 @@ class Constants {
     static get NS_XMPP_BIND() {
         return "urn:ietf:params:xml:ns:xmpp-bind";
     }
+    static get STANZA_MESSAGE_VALID_TYPE() {
+        return ["error"];
+    }
+    static get STANZA_PRESENCE_VALID_TYPE() {
+        return ["error"];
+    }
     static get STANZA_IQ_VALID_TYPE() {
         return ["get", "set", "result", "error"];
     }
