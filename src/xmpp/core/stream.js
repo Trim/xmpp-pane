@@ -18,6 +18,9 @@ class Stream {
         // XML DOM tree (cleared each time)
         this.dom = document.implementation.createDocument(null, null);
 
+        // Closing state
+        this.isClosing = false;
+
         // DOM Parser can parse XML string to DOM (created once)
         if (!this.domParser) {
             this.domParser = new DOMParser();

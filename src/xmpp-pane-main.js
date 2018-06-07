@@ -127,6 +127,14 @@ xmppClientListener = function (message, sender, sendResponse) {
             );
         break;
 
+    case 'disconnect':
+        xmppPaneClient.close();
+
+        sendResponse({
+            connected: false
+        });
+        break;
+
     case 'exploreServer':
         asynchroneResponse = true;
         xmppPaneClient.discoPubsubService(message.payload)

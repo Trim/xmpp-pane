@@ -24,8 +24,13 @@ class Client {
         this.password = _config.password;
         delete this.config.password;
 
+        this.init();
+    }
+
+    // To go back or to construct the intial client state
+    init() {
         // optional websocketURL
-        this.websocketURL = _config.websocketURL;
+        this.websocketURL = this.config.websocketURL;
 
         // DOM toolbox
         this.dom = document.implementation.createDocument(null, null);

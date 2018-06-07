@@ -56,6 +56,9 @@ class FramedStream extends Stream {
      */
     close() {
         return new Promise((resolve, reject) => {
+            // Save we are closing to avoid send again the same message
+            this.isClosing = true;
+
             let close = this.dom.createElementNS(Constants.NS_XMPP_FRAMING, "close");
             close.setAttribute("to", this.to);
             close.setAttribute("version", Constants.XMPP_VERSION);
@@ -78,7 +81,17 @@ class FramedStream extends Stream {
             // Initiate close when receiving <close>
             // <close> can contain see-other-uri to redirect the stream
             // (be careful to keep same security at least in that case)
-            xmppClient.close();
+            if (this.isClosing) {
+                // Well we asked to close and the close has been aknowleged
+                console.log('framed-stream: received <close> after self-initiated close: reinit client.');
+                xmppClient.init();
+            }
+            else {
+                // We didn't initiate the close, call close and reinit directly the client
+                console.log('framed-stream: received <close> from server: acknowledge and reinit client.');
+                xmppClient.close();
+                xmppClient.init();
+            }
             break;
         default:
             super.handle(xmppClient, message);
